@@ -2,5 +2,8 @@
 <resources>
 
     <string name="app_name">DoodleJump</string>
+    <string name="play_button">Play</string>
+    <string name="doodle_jump_title">Doodle Jump</string>
+    <string name="play_button_text">Play</string>
 
 </resources>
