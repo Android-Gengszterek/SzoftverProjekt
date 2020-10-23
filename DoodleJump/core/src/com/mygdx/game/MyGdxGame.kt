@@ -25,6 +25,10 @@ class MyGdxGame : ApplicationAdapter() {
         gameStateManager = GameStateManager()
         gameStateManager.push(PlayState(gameStateManager))
 
+        if(Gdx.input.isTouched){
+            Gdx.app.log("Debug", "Touched!")
+        }
+
         Gdx.gl.glClearColor(1f, 0f, 0f, 1f)
     }
 

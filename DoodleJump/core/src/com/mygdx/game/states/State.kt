@@ -19,5 +19,6 @@ abstract class State{
     protected abstract fun handleInput():Unit
     public abstract fun update(dt:Float):Unit
     abstract fun render(spriteBatch: SpriteBatch): Unit
+    abstract fun dispose(): Unit
 
 }
