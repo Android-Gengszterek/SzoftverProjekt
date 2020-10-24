@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.MenuFragment"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:showDividers="middle"
+    android:dividerPadding="40dp"
+    >
+
+
+    <Button
+        android:id="@+id/log_in_button"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:background="@drawable/menu_button"
+        android:fontFamily="casual"
+        android:shadowColor="#BD8751"
+        android:shadowDx="5"
+        android:shadowDy="3"
+        android:shadowRadius="5"
+        android:text="@string/log_in_text"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:onClick="loginButtonPressed"/>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="70dp" />
+
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:background="@drawable/menu_button"
+        android:fontFamily="casual"
+        android:shadowColor="#BD8751"
+        android:shadowDx="5"
+        android:shadowDy="3"
+        android:shadowRadius="5"
+        android:text="@string/register_button_text"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+</LinearLayout>
