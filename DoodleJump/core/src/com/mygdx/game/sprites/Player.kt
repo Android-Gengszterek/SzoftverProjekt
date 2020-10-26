@@ -25,26 +25,31 @@ class Player{
     }
 
     fun update(dt:Float):Unit {
+        // the character will fall with a scaling GRAVITY
         velocity.add(0f,GRAVITY,0f)
         velocity.scl(dt)
+        // the new velocities will be added to the player
         position.add(velocity.x,velocity.y,0f)
+
+        //if the character goes out in the left of the screen it will be replaced in the right side of the screen
         if(position.x+100f < 0f){
             position.x = Gdx.graphics.width.toFloat()
         }
-
+        // if the character goes out in the right side of the screen it will be replaced in the left side of the screen
         if(position.x > Gdx.graphics.width.toFloat()){
             position.x = 0f
         }
+        // if the character's velocity is less then 0 it is falling
         if(velocity.y < 0){
             isFalling = true
         }
 
         velocity.scl(1/dt)
+        // the bound of the player is following the character
         bounds.setPosition(position.x,position.y)
     }
 
     fun goLeft():Unit{
-        //velocity.add(-10f, 0f,0f)
         velocity.x = -400f
     }
 
@@ -62,8 +67,9 @@ class Player{
     }
 
     fun stopFall():Unit{
-        velocity.y = 0f
+        velocity.y = -GRAVITY
     }
+
 
 
 
