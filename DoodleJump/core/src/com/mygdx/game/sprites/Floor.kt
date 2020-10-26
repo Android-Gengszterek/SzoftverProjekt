@@ -14,9 +14,7 @@ class Floor{
 
     constructor(){
         floorTexture = Texture("floor.png")
-
         floorPosition = Vector2(-floorTexture.width.toFloat(),-floorTexture.height/2f)
-       // bounds = Rectangle(Gdx.graphics.height-(floorTexture.height/2f), 0f,Gdx.graphics.width.toFloat(), floorTexture.height.toFloat() )
         bounds = Rectangle(floorPosition.x, floorPosition.y,Gdx.graphics.width.toFloat()*2, floorTexture.height.toFloat() )
 
     }
