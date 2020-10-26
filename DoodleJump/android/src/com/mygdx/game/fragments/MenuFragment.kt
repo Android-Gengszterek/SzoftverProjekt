@@ -2,12 +2,15 @@ package com.mygdx.game.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.mygdx.game.R
+import com.mygdx.game.classes.USER_CLASS
+import com.mygdx.game.classes.User
 
 
 class MenuFragment : Fragment() {
@@ -27,10 +30,10 @@ class MenuFragment : Fragment() {
         loginButton = view.findViewById(R.id.log_in_button)
         registerButton = view.findViewById(R.id.register_button)
         loginButton.setOnClickListener{
-            loginButtonPressed(it)
+            loginButtonPressed()
         }
         registerButton.setOnClickListener {
-            registerButtonPressed(it)
+            registerButtonPressed()
         }
 
         return view
@@ -41,11 +44,11 @@ class MenuFragment : Fragment() {
     }
 
     @SuppressLint("CommitTransaction")
-    private fun loginButtonPressed(view: View){
+    private fun loginButtonPressed(){
         fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, LoginFragment())?.commit()
     }
 
-    private fun registerButtonPressed(view: View){
+    private fun registerButtonPressed(){
         fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, RegisterFragment())?.commit()
     }
 

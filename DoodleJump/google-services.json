@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1008737449226",
+    "firebase_url": "https://doodle-jump-2975c.firebaseio.com",
+    "project_id": "doodle-jump-2975c",
+    "storage_bucket": "doodle-jump-2975c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008737449226:android:ecd6f19399b5c691e3b6f3",
+        "android_client_info": {
+          "package_name": "com.mygdx.game"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1008737449226-skcr948u05d0u8gggkackung05qld9dt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc_V2ltnIkTCWKO35kvB_UFl5P3K6tEL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1008737449226-skcr948u05d0u8gggkackung05qld9dt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
