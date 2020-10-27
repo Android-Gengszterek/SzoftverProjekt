@@ -50,6 +50,12 @@ class LoginFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        userName.text = null
+        password.text = null
+        super.onResume()
+    }
+
     private fun setupUI(view: View){
         database = Firebase.database.reference
         backButton = view.findViewById(R.id.back_button)
@@ -110,7 +116,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun backButtonPressed(){
-        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, MenuFragment())?.commit()
+        fragmentManager?.popBackStack()
     }
 
     private  fun logInButtonPressed(){
@@ -124,7 +130,7 @@ class LoginFragment : Fragment() {
                     R.id.fragment_container,
                     userFragment,
                     LOGIN_TAG
-            )?.addToBackStack(LOGIN_TAG)?.commit()
+            )?.commit()
         }
         else {
             Log.d("Login", "Can not login")
