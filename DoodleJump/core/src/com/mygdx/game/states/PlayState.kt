@@ -1,15 +1,17 @@
 package com.mygdx.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.math.Vector2
-import com.mygdx.game.MyGdxGame
+import com.mygdx.game.scenes.Hud
 import com.mygdx.game.sprites.Floor
 import com.mygdx.game.sprites.GreenPlatform
 import com.mygdx.game.sprites.Player
+import com.mygdx.game.sprites.Score
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -28,16 +30,18 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     private var platforms: java.util.ArrayList<GreenPlatform>
     var backgroundImagePosition: Vector2
     var backgroundImage2Position: Vector2
+    var score:Score
 
     //initializing attributes
     init {
         backgroundImage = Texture("background.png")
-        backgroundImagePosition = Vector2(cam.position.x-cam.viewportWidth/2,0f)
+        backgroundImagePosition = Vector2(cam.position.x - cam.viewportWidth / 2, 0f)
         backgroundImage2 = Texture("background.png")
-        backgroundImage2Position = Vector2(cam.position.x-cam.viewportWidth/2,Gdx.graphics.height.toFloat())
+        backgroundImage2Position = Vector2(cam.position.x - cam.viewportWidth / 2, Gdx.graphics.height.toFloat())
 
         floor = Floor()
-        player = Player(Gdx.graphics.width/2 - 200,150)
+        player = Player(Gdx.graphics.width / 2 - 200, 150)
+        score = Score(cam)
         platforms = ArrayList<GreenPlatform>()
 
         // placing platforms randomly
@@ -49,7 +53,10 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         }
 
         // setting the camera position
-        cam.setToOrtho(false,Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        cam.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+
+
+
 
     }
 
@@ -78,11 +85,14 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     }
 
     override fun update(dt: Float) {
+
         // in every update we handle the input and update the background and the players position if it is necessary
+        updateScore()
         handleInput()
         updateBackground()
         player.update(dt)
         cam.update()
+        score.updateScorePosition()
 
         // if the player falls below the camera's y position then the game ends and a new state will start
         if((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height/2))){
@@ -115,16 +125,21 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
 
     // in the render we draw every element on the screen
     override fun render(spriteBatch: SpriteBatch) {
+
         spriteBatch.projectionMatrix = cam.combined
         spriteBatch.begin()
 
-        spriteBatch.draw(backgroundImage,backgroundImagePosition.x,backgroundImagePosition.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        spriteBatch.draw(backgroundImage2,backgroundImage2Position.x,backgroundImage2Position.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        spriteBatch.draw(floor.floorTexture,0f-(Gdx.graphics.width/2),floor.floorPosition.y,Gdx.graphics.width.toFloat()*2,500f)
-        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y,300f,300f)
+        spriteBatch.draw(backgroundImage, backgroundImagePosition.x, backgroundImagePosition.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        spriteBatch.draw(backgroundImage2, backgroundImage2Position.x, backgroundImage2Position.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        spriteBatch.draw(floor.floorTexture, 0f - (Gdx.graphics.width / 2), floor.floorPosition.y, Gdx.graphics.width.toFloat() * 2, 500f)
+
+
         for(platform in platforms){
-            spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x,platform.platformPosition.y,200f,60f)
+            spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
         }
+        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, 300f, 300f)
+
+        score.bitmapFont.draw(spriteBatch, score.score.toString(), score.scorePosition.x, score.scorePosition.y)
 
         spriteBatch.end()
     }
@@ -143,11 +158,19 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     // if the camera's position is greater than the height of the background image, the background image will be placed at the top
     fun updateBackground():Unit{
         if(player.position.y-(cam.viewportHeight)   > backgroundImagePosition.y + (Gdx.graphics.height.toFloat()/2)){
-            backgroundImagePosition.add(0f,Gdx.graphics.height.toFloat()*2)
+            backgroundImagePosition.add(0f, Gdx.graphics.height.toFloat() * 2)
         }
         if(player.position.y-(cam.viewportHeight)    > backgroundImage2Position.y+ (Gdx.graphics.height.toFloat()/2)){
-            backgroundImage2Position.add(0f,Gdx.graphics.height.toFloat()*2)
+            backgroundImage2Position.add(0f, Gdx.graphics.height.toFloat() * 2)
         }
     }
+
+    // every 100 pixel the player gets 1 point
+    fun updateScore(){
+        if(player.position.y.toInt() / 100 > score.score) {
+            score.score = player.position.y.toInt() / 100
+        }
+    }
+
 
 }
