@@ -52,7 +52,8 @@ class MenuFragment : Fragment() {
     }
 
     private fun registerButtonPressed(){
-        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, RegisterFragment())?.commit()
+        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, RegisterFragment())?.
+        addToBackStack(MENU_TAG)?.commit()
     }
 
 

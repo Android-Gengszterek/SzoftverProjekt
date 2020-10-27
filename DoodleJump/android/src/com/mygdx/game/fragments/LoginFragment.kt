@@ -1,8 +1,6 @@
 package com.mygdx.game.fragments
 
-import android.content.Intent
 import android.os.Bundle
-import android.provider.AlarmClock.EXTRA_MESSAGE
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.core.os.bundleOf
 
 import androidx.fragment.app.Fragment
 import com.google.firebase.database.DataSnapshot
@@ -43,7 +40,6 @@ class LoginFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_login, container, false)
         setupUI(view)
 
@@ -71,10 +67,10 @@ class LoginFragment : Fragment() {
                     val key = d.key.toString()
                     val username = d.child("userName").value.toString()
                     val password = d.child("password").value.toString()
-                    val scores = d.child("scores").value as ArrayList<String>
-                    val user = User(username,password, scores)
+                    val scores = d.child("scores").value as? ArrayList<String>
+                    val user = User(key, username, password, scores)
                     users.add(user)
-                    Log.d("Users", user.toString())
+                    //Log.d("Users", user.toString())
                 }
             }
 
@@ -123,9 +119,9 @@ class LoginFragment : Fragment() {
         if (checkEmptyFields() && checkUsernameAndPassword()) {
            val userFragment = UserFragment()
             val bundle = Bundle()
-            bundle.putSerializable(USER_CLASS, myUser)
+            bundle.putSerializable(USER_CLASS, myUser.userId)
             userFragment.arguments = bundle
-
+            Toast.makeText(this.context, "Login Success", Toast.LENGTH_SHORT).show()
             fragmentManager?.beginTransaction()?.replace(
                     R.id.fragment_container,
                     userFragment,
