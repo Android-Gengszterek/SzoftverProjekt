@@ -2,13 +2,17 @@ package com.mygdx.game.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.mygdx.game.R
+import com.mygdx.game.classes.USER_CLASS
+import com.mygdx.game.classes.User
 
+const val MENU_TAG = "MenuFragment"
 
 class MenuFragment : Fragment() {
 
@@ -27,27 +31,31 @@ class MenuFragment : Fragment() {
         loginButton = view.findViewById(R.id.log_in_button)
         registerButton = view.findViewById(R.id.register_button)
         loginButton.setOnClickListener{
-            loginButtonPressed(it)
+            loginButtonPressed()
         }
         registerButton.setOnClickListener {
-            registerButtonPressed(it)
+            registerButtonPressed()
         }
 
         return view
     }
+
 
     companion object {
         fun newInstance() = MenuFragment()
     }
 
     @SuppressLint("CommitTransaction")
-    private fun loginButtonPressed(view: View){
-        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, LoginFragment())?.commit()
+    private fun loginButtonPressed(){
+        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, LoginFragment())?.
+        addToBackStack(MENU_TAG)?.commit()
     }
 
-    private fun registerButtonPressed(view: View){
-        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, RegisterFragment())?.commit()
+    private fun registerButtonPressed(){
+        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, RegisterFragment())?.
+        addToBackStack(MENU_TAG)?.commit()
     }
 
 
 }
+
