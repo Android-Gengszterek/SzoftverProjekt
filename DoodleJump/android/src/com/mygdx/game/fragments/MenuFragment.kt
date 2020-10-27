@@ -12,6 +12,7 @@ import com.mygdx.game.R
 import com.mygdx.game.classes.USER_CLASS
 import com.mygdx.game.classes.User
 
+const val MENU_TAG = "MenuFragment"
 
 class MenuFragment : Fragment() {
 
@@ -39,13 +40,15 @@ class MenuFragment : Fragment() {
         return view
     }
 
+
     companion object {
         fun newInstance() = MenuFragment()
     }
 
     @SuppressLint("CommitTransaction")
     private fun loginButtonPressed(){
-        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, LoginFragment())?.commit()
+        fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, LoginFragment())?.
+        addToBackStack(MENU_TAG)?.commit()
     }
 
     private fun registerButtonPressed(){
@@ -54,3 +57,4 @@ class MenuFragment : Fragment() {
 
 
 }
+

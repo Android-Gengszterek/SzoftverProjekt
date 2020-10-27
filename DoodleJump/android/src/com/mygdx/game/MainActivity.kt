@@ -34,16 +34,10 @@ class MainActivity : AppCompatActivity() {
         val fragment = MenuFragment()
         fragmentTransaction.add(R.id.fragment_container, fragment)
         fragmentTransaction.commit()
-
-        //System.out.println(database.child("users"))
     }
 
     fun playButtonPressed(view: View){
         val intent = Intent(this, AndroidLauncher::class.java)
         startActivity(intent)
-    }
-
-    fun loginButtonPressed(){
-        supportFragmentManager.beginTransaction().add(R.id.fragment_container, LoginFragment()).commit()
     }
 }
