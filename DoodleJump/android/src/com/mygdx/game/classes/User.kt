@@ -9,5 +9,5 @@ data class User(
         var userId: String? = "",
         var userName: String? = "",
         var password: String? = "",
-        var scores: ArrayList<String>? = ArrayList()
+        var scores: ArrayList<String>?
 ) : Serializable

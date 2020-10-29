@@ -19,6 +19,7 @@ import com.mygdx.game.classes.*
 
 const val USER_TAG = "User"
 
+@Suppress("UNCHECKED_CAST")
 class UserFragment : Fragment() {
 
     private lateinit var logOutButton: Button
@@ -81,7 +82,7 @@ class UserFragment : Fragment() {
 
                 }
                 myUser.scores?.forEach {
-                    val scoreValue = snapshot.child(it).child("scoreValue").value.toString()
+                    val scoreValue = snapshot.child(it.toString()).child("scoreValue").value.toString()
                     myScores.add(Score(null , scoreValue  ))
                 }
                 myScores.sortByDescending {

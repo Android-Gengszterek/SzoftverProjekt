@@ -90,7 +90,7 @@ class RegisterFragment : Fragment() {
                     val key = d.key.toString()
                     val username = d.child("userName").value.toString()
                     val password = d.child("password").value.toString()
-                    val scores = d.child("scores").value as? ArrayList<String>
+                    val scores = d.child("scores").value as ArrayList<String>
                     val user = User(key, username,password, scores)
                     users.add(user)
                     Log.d("Users", user.toString())
@@ -104,7 +104,7 @@ class RegisterFragment : Fragment() {
     private fun writeNewUser(userName: String, password: String) {
         val key = database.child("users").push().key.toString()
         myUserKey = key
-        val user = User(null, userName, password )
+        val user = User(null, userName, password , null)
         database.child("users").child(key).setValue(user)
                 .addOnSuccessListener {
                     Toast.makeText(this.context, "Registration success", Toast.LENGTH_LONG).show()
