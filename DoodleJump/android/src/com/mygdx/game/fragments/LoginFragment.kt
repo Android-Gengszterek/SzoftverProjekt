@@ -70,7 +70,7 @@ class LoginFragment : Fragment() {
                     val scores = d.child("scores").value as? ArrayList<String>
                     val user = User(key, username, password, scores)
                     users.add(user)
-                    //Log.d("Users", user.toString())
+                    Log.d("Users", user.toString())
                 }
             }
 
