@@ -18,5 +18,7 @@
     <string name="username_textView">Username</string>
     <string name="score_text">Score</string>
     <string name="log_out_text">Log Out</string>
+    <string name="best_scores">My Scores</string>
+    <string name="leaderboard">Leaderboard</string>
 
 </resources>

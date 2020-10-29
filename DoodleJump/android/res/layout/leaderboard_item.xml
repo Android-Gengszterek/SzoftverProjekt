@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@null"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardPreventCornerOverlap="false"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@null">
+
+        <TextView
+            android:id="@+id/leader_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_green_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="10dp" />
+
+        <TextView
+            android:id="@+id/leader_value"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+
+            android:fontFamily="casual"
+            android:paddingLeft="5dp"
+            android:textColor="@android:color/black"
+
+            android:textSize="15sp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/leader_number"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/leader_user"
+            android:paddingStart="5dp"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/leader_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:fontFamily="casual"
+            android:gravity="center"
+            android:textColor="@android:color/black"
+
+            android:layout_marginRight="20dp"
+            android:layout_marginEnd="20dp"
+
+            android:textSize="15sp"
+            android:textStyle="italic"
+            app:layout_constraintLeft_toRightOf="@id/leader_value"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.625"
+             />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+</androidx.cardview.widget.CardView>

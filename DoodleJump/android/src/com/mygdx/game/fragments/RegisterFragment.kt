@@ -142,8 +142,8 @@ class RegisterFragment : Fragment() {
     }
 
     private fun userDataCheck() = when {
-        userNameEditText.text.length < 5 -> {
-            userNameEditText.error = "Minimum 5 character"
+        userNameEditText.text.length < 5 || userNameEditText.text.length > 10 -> {
+            userNameEditText.error = "Minimum 5, maximum 10 character"
             false
         }
         !checkUniqueUsername() -> {
