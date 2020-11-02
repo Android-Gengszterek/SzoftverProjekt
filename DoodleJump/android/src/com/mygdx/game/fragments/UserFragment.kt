@@ -1,5 +1,9 @@
 package com.mygdx.game.fragments
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +23,7 @@ import com.mygdx.game.R
 import com.mygdx.game.classes.*
 
 const val USER_TAG = "User"
+const val USER_KEY = "userKey"
 
 @Suppress("UNCHECKED_CAST")
 class UserFragment : Fragment() {
@@ -34,6 +40,7 @@ class UserFragment : Fragment() {
     private lateinit var myScores: ArrayList<Score>
     private lateinit var allScores: ArrayList<Score>
     private lateinit var database: DatabaseReference
+    private lateinit var sp: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +60,7 @@ class UserFragment : Fragment() {
         userNameTextView = view.findViewById(R.id.textView2)
         logOutButton = view.findViewById(R.id.log_out_button)
         logOutButton.setOnClickListener {
+            sp.edit().putBoolean("logged",false).apply();
             fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, MenuFragment())?.commit()
         }
         database = Firebase.database.reference
@@ -60,6 +68,8 @@ class UserFragment : Fragment() {
         allScores = ArrayList()
         viewManager = LinearLayoutManager(this.context)
         viewManager2 = LinearLayoutManager(this.context)
+        sp = activity!!.getSharedPreferences("login", MODE_PRIVATE)
+
 
         //        val scores = ArrayList<String>()
         //        scores.add("newScoreID")
@@ -115,9 +125,12 @@ class UserFragment : Fragment() {
         Log.d(USER_TAG, myScores.toString())
     }
 
+    @SuppressLint("CommitPrefEdits")
     private fun loadData(view: View) {
         val args: Bundle? = arguments
         val userId = args?.getSerializable(USER_CLASS) as String
+        sp.edit().putString("userKey",userId).apply()
+        sp.edit().putBoolean("logged",true).apply()
         val db = database.child("users")
         db.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
