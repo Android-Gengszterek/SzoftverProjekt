@@ -1,15 +1,11 @@
 package com.mygdx.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.math.Vector2
-import com.mygdx.game.scenes.Hud
 import com.mygdx.game.sprites.Floor
-import com.mygdx.game.sprites.GreenPlatform
+import com.mygdx.game.sprites.Platform
 import com.mygdx.game.sprites.Player
 import com.mygdx.game.sprites.Score
 import java.util.*
@@ -27,7 +23,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     private var floor: Floor
     private var player: Player
     private lateinit var rand: Random
-    private var platforms: java.util.ArrayList<GreenPlatform>
+    private var platforms: java.util.ArrayList<Platform>
     var backgroundImagePosition: Vector2
     var backgroundImage2Position: Vector2
     var score:Score
@@ -42,15 +38,21 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         floor = Floor()
         player = Player(Gdx.graphics.width / 2 - 200, 150)
         score = Score(cam)
-        platforms = ArrayList<GreenPlatform>()
+        platforms = ArrayList<Platform>()
 
+        rand = Random()
+        var randNumber = rand.nextFloat() * PLATFORM_COUNT
         // placing platforms randomly
+        var platformType:String
         for(i in 0..PLATFORM_COUNT){
-            rand = Random()
-            if(i * PLATFORM_SPACING + PLATFORM_HEIGHT > floor.floorPosition.y + floor.floorTexture.height) {
-                platforms.add(GreenPlatform(i * (PLATFORM_SPACING + PLATFORM_HEIGHT)))
+            if (i * PLATFORM_SPACING + PLATFORM_HEIGHT > floor.floorPosition.y + floor.floorTexture.height) {
+                platforms.add(Platform(i * (PLATFORM_SPACING + PLATFORM_HEIGHT), "grassplatform.png",false))
             }
         }
+        if (randNumber * PLATFORM_SPACING + PLATFORM_HEIGHT > floor.floorPosition.y + floor.floorTexture.height) {
+            platforms.add(Platform(randNumber * (PLATFORM_SPACING + PLATFORM_HEIGHT), "woodplatform.png",true))
+        }
+
 
         // setting the camera position
         cam.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
@@ -111,13 +113,37 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         }
 
         for(platform in platforms){
-            // if the player is falling and touches any of the platforms then the character will jump
-            if((player.isFalling) && platform.collide(player.bounds)){
-                player.jump()
-            }
-            // if the platforms are below the camera's viewport then the platforms will be replaced above
-            if(player.position.y-(cam.viewportHeight/2)  > platform.platformPosition.y + PLATFORM_HEIGHT){
-                platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT)))
+            // if the platform isnt wood platform
+            if(!platform.isWood) {
+                // if the player is falling and touches any of the platforms then the character will jump
+                if ((player.isFalling) && platform.collide(player.bounds)) {
+                    player.jump()
+                }
+                // if the platforms are below the camera's viewport then the platforms will be replaced above
+                if (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT) {
+                    platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT)))
+                }
+            } else{
+                // if the player touches the wood platform he will fall with the wood platform
+                if ((player.isFalling) && platform.collide(player.bounds)) {
+                    platform.platformFall()
+                }
+                // every 50 score the wooden platform will be replaced checking itt will not collide with any other platforms
+                if (( score.score % 50 == 0) && (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT)) {
+                    platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT)) + (backgroundImage.height/2))
+                    do{
+                        var collideWithOthers = false
+                        platform.repositionWoodenAlongX(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT))+ (backgroundImage.height/2))
+
+                        for(greenPlatform in platforms){
+                            if(!greenPlatform.isWood && platform.collide(greenPlatform.bounds)){
+                                collideWithOthers = true
+                            }
+                        }
+                    }while(collideWithOthers)
+
+
+                }
             }
         }
     }
@@ -135,7 +161,11 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
 
 
         for(platform in platforms){
-            spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
+            if(!platform.isWood) {
+                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
+            } else{
+                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 200f)
+            }
         }
         spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, 300f, 300f)
 
