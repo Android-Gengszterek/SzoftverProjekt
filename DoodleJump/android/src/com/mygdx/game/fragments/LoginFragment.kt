@@ -117,7 +117,7 @@ class LoginFragment : Fragment() {
 
     private  fun logInButtonPressed(){
         if (checkEmptyFields() && checkUsernameAndPassword()) {
-           val userFragment = UserFragment()
+            val userFragment = UserFragment()
             val bundle = Bundle()
             bundle.putSerializable(USER_CLASS, myUser.userId)
             userFragment.arguments = bundle
