@@ -15,7 +15,7 @@ import kotlin.collections.ArrayList
 class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     companion object{
         private var PLATFORM_SPACING:Float = 500f
-        private var PLATFORM_COUNT:Int = 4
+        private var PLATFORM_COUNT:Int = 10
         private var PLATFORM_HEIGHT:Float = 60f
     }
     private var backgroundImage: Texture
@@ -24,9 +24,12 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     private var player: Player
     private lateinit var rand: Random
     private var platforms: java.util.ArrayList<Platform>
+    private var platformsDoubler: java.util.ArrayList<Platform>
+    private var doublersDeactivated: ArrayList<Boolean>
     var backgroundImagePosition: Vector2
     var backgroundImage2Position: Vector2
     var score:Score
+    var allPlatforms:List<Platform>
 
     //initializing attributes
     init {
@@ -39,14 +42,25 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         player = Player(Gdx.graphics.width / 2 - 200, 150)
         score = Score(cam)
         platforms = ArrayList<Platform>()
+        platformsDoubler = ArrayList<Platform>()
+        doublersDeactivated = ArrayList<Boolean>()
 
         rand = Random()
         var randNumber = rand.nextFloat() * PLATFORM_COUNT
         // placing platforms randomly
-        var platformType:String
         for(i in 0..PLATFORM_COUNT){
             if (i * PLATFORM_SPACING + PLATFORM_HEIGHT > floor.floorPosition.y + floor.floorTexture.height) {
+                var uniqueSpacingMultiplier = rand.nextFloat()
+                //Adding new platform
                 platforms.add(Platform(i * (PLATFORM_SPACING + PLATFORM_HEIGHT), "grassplatform.png",false))
+                // Add a new platform above the platfrom
+                platformsDoubler.add(Platform(i * (PLATFORM_SPACING * uniqueSpacingMultiplier + PLATFORM_HEIGHT), "grassplatform.png",false))
+                //If the other platfrom collides with the previous platform it will be replaced
+                while(platforms[platforms.size-1].collide(platformsDoubler[platformsDoubler.size-1].bounds) ){
+                    platformsDoubler[platformsDoubler.size-1].repositionWoodenAlongX(platformsDoubler[platformsDoubler.size-1].platformPosition.y)
+                }
+                platformsDoubler[i-1].uniqueSpacingMultiplier = uniqueSpacingMultiplier
+                doublersDeactivated.add(false)
             }
         }
         if (randNumber * PLATFORM_SPACING + PLATFORM_HEIGHT > floor.floorPosition.y + floor.floorTexture.height) {
@@ -58,7 +72,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         cam.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 
 
-
+        allPlatforms = platforms + platformsDoubler
 
     }
 
@@ -102,6 +116,30 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             platforms[platforms.size - 1].stopFall()
         }
 
+        // If the player reaches the score a certain platform will move and a certain platform will be deleted
+        when(score.score){
+            100 -> makeMoveAndReduceSize(platforms[0], platformsDoubler,doublersDeactivated)
+            500 -> makeMoveAndReduceSize(platforms[2], platformsDoubler,doublersDeactivated)
+            1000 -> makeMoveAndReduceSize(platforms[6],platformsDoubler,doublersDeactivated)
+            2000 -> makeMoveAndReduceSize(platforms[9],platformsDoubler,doublersDeactivated)
+            2500 -> makeMoveAndReduceSize(platforms[5],platformsDoubler,doublersDeactivated)
+            3000 -> makeMoveAndReduceSize(platforms[3],platformsDoubler,doublersDeactivated)
+            4000 -> makeMoveAndReduceSize(platforms[4],platformsDoubler,doublersDeactivated)
+            8000 -> makeMoveAndReduceSize(platforms[7],platformsDoubler,doublersDeactivated)
+            10000 -> makeMoveAndReduceSize(platforms[1],platformsDoubler,doublersDeactivated)
+            12000 -> makeMoveAndReduceSize(platforms[8],platformsDoubler,doublersDeactivated)
+        }
+
+        //If the platform is moving it will be redirected at the borders
+        for(platform in platforms){
+            platform.update(dt)
+            if(!platform.isWood){
+                if(platform.platformPosition.x < 0 ){ platform.turnRight() }
+                if(platform.platformPosition.x + platform.bounds.width > Gdx.graphics.width) platform.turnLeft()
+            }
+        }
+
+
         // if the player falls below the camera's y position then the game ends and a new state will start
         if((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height/2))){
             gameStateManager.pop()
@@ -137,19 +175,20 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
                 // every 50 score the wooden platform will be replaced checking itt will not collide with any other platforms
                 if (( score.score % 50 == 0) && (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT)) {
                     platform.reposition(player.position.y + (Gdx.graphics.height/2))
-                    do{
-                        var collideWithOthers = false
-                        platform.repositionWoodenAlongX(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT))+ (backgroundImage.height/2))
-
-                        for(greenPlatform in platforms){
-                            if(!greenPlatform.isWood && platform.collide(greenPlatform.bounds)){
-                                collideWithOthers = true
-                            }
-                        }
-                    }while(collideWithOthers)
-
-
+                    repositionIfCollideWithOtherPlatforms(platform,allPlatforms,false)
                 }
+            }
+        }
+        for(platform in platformsDoubler) {
+            // if the platform isnt wood platform
+            // if the player is falling and touches any of the platforms then the character will jump
+            if ((player.isFalling) && platform.collide(player.bounds)) {
+                player.jump()
+            }
+            // if the platforms are below the camera's viewport then the platforms will be replaced above
+            if (player.position.y - (Gdx.graphics.height/2) > platform.platformPosition.y + PLATFORM_HEIGHT) {
+                //platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING * (1+platform.uniqueSpacingMultiplier) + PLATFORM_HEIGHT)))
+                repositionIfCollideWithOtherPlatforms(platform,allPlatforms,true)
             }
         }
     }
@@ -173,6 +212,11 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
                 spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 200f)
             }
         }
+
+        for(platform in platformsDoubler){
+            spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
+        }
+
         spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, 300f, 300f)
 
         score.bitmapFont.draw(spriteBatch, score.score.toString(), score.scorePosition.x, score.scorePosition.y)
@@ -213,6 +257,32 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             player.speedUp()
         }
 
+    }
+
+    //If the platform collides with any of the platforms in the list it will be repositioned
+    fun repositionIfCollideWithOtherPlatforms(platform: Platform, platforms: List<Platform>, isDoubler:Boolean){
+        do{
+            var collideWithOthers = false
+            if(!isDoubler) {
+                platform.repositionWoodenAlongX(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT)) + (backgroundImage.height / 2))
+            }else{
+                platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING * (1+platform.uniqueSpacingMultiplier) + PLATFORM_HEIGHT)))
+            }
+            for(greenPlatform in platforms){
+                if(!greenPlatform.isWood && platform.collide(greenPlatform.bounds)){
+                    collideWithOthers = true
+                }
+            }
+        }while(collideWithOthers)
+    }
+
+    //This function make a platform move and remove another platfrom from the doublers
+    fun makeMoveAndReduceSize(platform: Platform, platformDoubler:ArrayList<Platform>, doublersDeactivated: ArrayList<Boolean>){
+        platform.startMove()
+        if(!doublersDeactivated[platformDoubler.size-1]) {
+            platformDoubler.remove(platformDoubler[platformDoubler.size - 1])
+            doublersDeactivated[platformDoubler.size-1] = true
+        }
     }
 
 

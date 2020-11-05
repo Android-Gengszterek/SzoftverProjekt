@@ -56,10 +56,12 @@ class Player{
 
     fun goLeft():Unit{
         velocity.x = -400f - turnSpeed
+        playerTexture = Texture("player.png")
     }
 
     fun goRight():Unit{
         velocity.x = 400f + turnSpeed
+        playerTexture = Texture("player2.png")
     }
 
     fun jump():Unit{
@@ -77,10 +79,10 @@ class Player{
 
     fun speedUp():Unit{
         if(speedUpValue < 500f) {
-            speedUpValue += 5f
-            gravityChange -= 0.2f
+            speedUpValue += 2.5f
+            gravityChange -= 0.1f
             if(turnSpeed < 450f){
-                turnSpeed += 10f
+                turnSpeed += 5f
             }
         }
 

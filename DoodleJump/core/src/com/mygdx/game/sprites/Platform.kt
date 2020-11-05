@@ -15,6 +15,9 @@ class Platform {
     var velocity: Vector2
     var fallSpeed:Float
     var isWood: Boolean
+    var moveSpeed:Float
+    var isMooving: Boolean
+    var uniqueSpacingMultiplier: Float = 500f
 
     companion object{
         private val GRAVITY:Float = -15f
@@ -30,7 +33,10 @@ class Platform {
 
         bounds = Rectangle(platformPosition.x, platformPosition.y,200f, 100f )
         this.isWood = isWood
+        isMooving = false
         fallSpeed = 0f
+        moveSpeed = 200f
+
     }
 
     fun reposition(y:Float):Unit{
@@ -64,6 +70,18 @@ class Platform {
         fallSpeed = 0f
     }
 
+    fun turnLeft(){
+        moveSpeed = -200f
+    }
+
+    fun turnRight(){
+        moveSpeed = 200f
+    }
+
+    fun startMove(){
+        isMooving = true
+    }
+
     fun update(dt:Float){
         if(isWood) {
             velocity.add(0f, fallSpeed)
@@ -72,6 +90,12 @@ class Platform {
             velocity.scl(1 / dt)
             bounds.setPosition(platformPosition.x, platformPosition.y)
             velocity.add(0f,-fallSpeed)
+        } else if(isMooving){
+            velocity.set(moveSpeed, 0f)
+            velocity.scl(dt)
+            platformPosition.add(velocity.x, 0f)
+            velocity.scl(1 / dt)
+            bounds.setPosition(platformPosition.x, platformPosition.y)
         }
     }
 }
