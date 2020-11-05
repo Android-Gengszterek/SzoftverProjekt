@@ -13,6 +13,7 @@ class Platform {
     private lateinit var rand: Random
     var bounds: Rectangle
     var velocity: Vector2
+    var fallSpeed:Float
     var isWood: Boolean
 
     companion object{
@@ -27,8 +28,9 @@ class Platform {
 
         platformPosition = Vector2(randNumber , y)
 
-        bounds = Rectangle(platformPosition.x, platformPosition.y,200f, 60f )
+        bounds = Rectangle(platformPosition.x, platformPosition.y,200f, 100f )
         this.isWood = isWood
+        fallSpeed = 0f
     }
 
     fun reposition(y:Float):Unit{
@@ -53,7 +55,23 @@ class Platform {
 
 
     fun platformFall(){
-        platformPosition.add(0f,-45f)
-        bounds.setPosition(platformPosition.x,platformPosition.y)
+        if(isWood) {
+            fallSpeed = -1600f
+        }
+    }
+
+    fun stopFall(){
+        fallSpeed = 0f
+    }
+
+    fun update(dt:Float){
+        if(isWood) {
+            velocity.add(0f, fallSpeed)
+            velocity.scl(dt)
+            platformPosition.add(0f, velocity.y)
+            velocity.scl(1 / dt)
+            bounds.setPosition(platformPosition.x, platformPosition.y)
+            velocity.add(0f,-fallSpeed)
+        }
     }
 }

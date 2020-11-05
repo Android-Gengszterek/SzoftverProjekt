@@ -92,9 +92,15 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         updateScore()
         handleInput()
         updateBackground()
+        updateSpeed()
         player.update(dt)
         cam.update()
         score.updateScorePosition()
+        if(platforms[platforms.size-1].platformPosition.y > cam.position.y - (Gdx.graphics.height)) {
+            platforms[platforms.size - 1].update(dt)
+        }else{
+            platforms[platforms.size - 1].stopFall()
+        }
 
         // if the player falls below the camera's y position then the game ends and a new state will start
         if((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height/2))){
@@ -130,7 +136,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
                 }
                 // every 50 score the wooden platform will be replaced checking itt will not collide with any other platforms
                 if (( score.score % 50 == 0) && (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT)) {
-                    platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT)) + (backgroundImage.height/2))
+                    platform.reposition(player.position.y + (Gdx.graphics.height/2))
                     do{
                         var collideWithOthers = false
                         platform.repositionWoodenAlongX(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT))+ (backgroundImage.height/2))
@@ -200,6 +206,13 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         if(player.position.y.toInt() / 100 > score.score) {
             score.score = player.position.y.toInt() / 100
         }
+    }
+
+    fun updateSpeed(){
+        if(score.score % 10 == 0){
+            player.speedUp()
+        }
+
     }
 
 

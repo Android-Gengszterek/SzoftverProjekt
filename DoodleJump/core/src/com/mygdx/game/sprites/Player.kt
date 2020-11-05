@@ -7,13 +7,15 @@ import com.badlogic.gdx.math.Vector3
 
 class Player{
     companion object{
-        private val GRAVITY:Float = -15f
+        private var GRAVITY:Float = -15f
     }
     var position: Vector3
     var velocity: Vector3
     var playerTexture: Texture
     var bounds: Rectangle
     var isFalling: Boolean
+    var speedUpValue: Float
+    var gravityChange:Float
 
     constructor(x:Int, y:Int){
         position = Vector3(x.toFloat(),y.toFloat(),0f)
@@ -21,12 +23,13 @@ class Player{
         playerTexture = Texture("player.png")
         bounds = Rectangle(position.x, position.y, playerTexture.width.toFloat(), playerTexture.height.toFloat())
         isFalling = true
-
+        speedUpValue = 0f
+        gravityChange = 0f
     }
 
     fun update(dt:Float):Unit {
         // the character will fall with a scaling GRAVITY
-        velocity.add(0f,GRAVITY,0f)
+        velocity.add(0f,GRAVITY + gravityChange,0f)
         velocity.scl(dt)
         // the new velocities will be added to the player
         position.add(velocity.x,velocity.y,0f)
@@ -58,7 +61,7 @@ class Player{
     }
 
     fun jump():Unit{
-        velocity.y = 1200f
+        velocity.y = 1200f + speedUpValue
         isFalling = false
     }
 
@@ -68,6 +71,14 @@ class Player{
 
     fun stopFall():Unit{
         velocity.y = -GRAVITY
+    }
+
+    fun speedUp():Unit{
+        if(speedUpValue < 500f) {
+            speedUpValue += 5f
+            gravityChange -= 0.2f
+        }
+
     }
 
 
