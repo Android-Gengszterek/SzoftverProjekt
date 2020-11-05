@@ -29,7 +29,7 @@ class MyGdxGame : ApplicationAdapter() {
             Gdx.app.log("Debug", "Touched!")
         }
 
-        Gdx.gl.glClearColor(1f, 0f, 0f, 1f)
+        //Gdx.gl.glClearColor(1f, 0f, 0f, 1f)
     }
 
     override fun render() {

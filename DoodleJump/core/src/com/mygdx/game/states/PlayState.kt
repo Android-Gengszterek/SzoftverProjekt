@@ -1,6 +1,7 @@
 package com.mygdx.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
@@ -22,11 +23,12 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     private var backgroundImage2: Texture
     private var floor: Floor
     private var player: Player
-    private lateinit var rand: Random
+    private var rand: Random
     private var platforms: java.util.ArrayList<Platform>
     var backgroundImagePosition: Vector2
-    var backgroundImage2Position: Vector2
-    var score:Score
+    private var backgroundImage2Position: Vector2
+    private var score: Score
+    private var music: Music
 
     //initializing attributes
     init {
@@ -34,6 +36,10 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         backgroundImagePosition = Vector2(cam.position.x - cam.viewportWidth / 2, 0f)
         backgroundImage2 = Texture("background.png")
         backgroundImage2Position = Vector2(cam.position.x - cam.viewportWidth / 2, Gdx.graphics.height.toFloat())
+        music = Gdx.audio.newMusic(Gdx.files.internal("African Safari Loop.wav"))
+        music.volume = 0.3f
+        music.isLooping = true
+        music.play()
 
         floor = Floor()
         player = Player(Gdx.graphics.width / 2 - 200, 150)
@@ -99,7 +105,10 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         // if the player falls below the camera's y position then the game ends and a new state will start
         if((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height/2))){
             gameStateManager.pop()
-            gameStateManager.push(PlayState(gameStateManager))
+            //Here window coming
+            music.stop()
+            gameStateManager.push(MenuState(gameStateManager, score.score))
+           // gameStateManager.push(PlayState(gameStateManager))
         }
 
         // if the players y position is greater than the height of the camera, then the camera will follow the player
@@ -162,12 +171,12 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
 
         for(platform in platforms){
             if(!platform.isWood) {
-                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
+                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 150f, 40f)
             } else{
-                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 200f)
+                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 150f, 150f)
             }
         }
-        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, 300f, 300f)
+        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, 200f, 200f)
 
         score.bitmapFont.draw(spriteBatch, score.score.toString(), score.scorePosition.x, score.scorePosition.y)
 

@@ -16,16 +16,16 @@ class Score {
     var scorePosition: Vector2
     var cam: OrthographicCamera
 
-    constructor(cam: OrthographicCamera){
+    constructor(cam: OrthographicCamera, size: Int = 100, color: Color = Color.GRAY, borderWidth: Float = 5f){
         this.cam = cam
 
         // initializing the font style and position
         fontGenerator = FreeTypeFontGenerator(Gdx.files.internal("PixelMechaBold.ttf"))
         fontParameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-        fontParameter.size = 100
-        fontParameter.borderWidth = 5f
+        fontParameter.size = size
+        fontParameter.borderWidth = borderWidth
         fontParameter .borderColor = Color.BLACK
-        fontParameter.color = Color.GRAY
+        fontParameter.color = color
         bitmapFont = fontGenerator.generateFont(fontParameter)
         score = 0
         scorePosition = Vector2(50f , cam.position.y + (Gdx.graphics.height/2)-50f )
