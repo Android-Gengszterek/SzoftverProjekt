@@ -209,7 +209,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     }
 
     fun updateSpeed(){
-        if(score.score % 10 == 0){
+        if(score.score % 100 == 0){
             player.speedUp()
         }
 

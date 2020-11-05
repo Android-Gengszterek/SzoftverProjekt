@@ -16,6 +16,7 @@ class Player{
     var isFalling: Boolean
     var speedUpValue: Float
     var gravityChange:Float
+    var turnSpeed: Float
 
     constructor(x:Int, y:Int){
         position = Vector3(x.toFloat(),y.toFloat(),0f)
@@ -25,6 +26,7 @@ class Player{
         isFalling = true
         speedUpValue = 0f
         gravityChange = 0f
+        turnSpeed = 0f
     }
 
     fun update(dt:Float):Unit {
@@ -53,11 +55,11 @@ class Player{
     }
 
     fun goLeft():Unit{
-        velocity.x = -400f
+        velocity.x = -400f - turnSpeed
     }
 
     fun goRight():Unit{
-        velocity.x = 400f
+        velocity.x = 400f + turnSpeed
     }
 
     fun jump():Unit{
@@ -77,6 +79,9 @@ class Player{
         if(speedUpValue < 500f) {
             speedUpValue += 5f
             gravityChange -= 0.2f
+            if(turnSpeed < 450f){
+                turnSpeed += 10f
+            }
         }
 
     }
