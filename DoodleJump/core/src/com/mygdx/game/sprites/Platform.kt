@@ -52,7 +52,7 @@ class Platform {
     fun collide(bound: Rectangle):Boolean{
         var position: Vector2 = Vector2()
         bound.getPosition(position)
-        if((position.y > platformPosition.y) && (position.y < platformPosition.y + 20) && (position.x > (platformPosition.x-270f)) && (position.x < platformPosition.x+60f)){
+        if(bounds.overlaps(bound) &&  (position.y > platformPosition.y) && (position.y < platformPosition.y + 20)){
             return true
         }
         return false

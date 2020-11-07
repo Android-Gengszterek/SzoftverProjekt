@@ -26,10 +26,12 @@ class Monster {
     }
 
     fun collide(player: Player):Boolean{
-        if( player.bounds.overlaps(bounds) ){
+        if( player.bounds.overlaps(bounds) && !player.isImmune){
+            // if the player touches the monster from below or from the sides then die
             if(player.bounds.y < monsterPosition.y+height-100f) {
                 return true
             } else {
+                // if the player touches the monster from the top then the character will jump and the monster will be raplaced
                 player.jump()
                 replaceMonster()
                 return false
@@ -38,7 +40,7 @@ class Monster {
         return false
     }
 
-
+    // The monster will be replaced by spacing
     fun replaceMonster(){
         monsterPosition.y = monsterPosition.y + (monsterSpacingAsScore*100f)
         bounds.x = monsterPosition.x
