@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     buildToolsVersion "30.0.2"
@@ -128,4 +129,3 @@ dependencies {
 }
 
 eclipse.project.name = appName + "-android"
-apply plugin: 'com.google.gms.google-services'

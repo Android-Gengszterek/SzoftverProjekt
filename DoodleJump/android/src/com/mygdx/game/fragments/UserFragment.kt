@@ -43,7 +43,7 @@ class UserFragment : Fragment() {
     private lateinit var allScores: ArrayList<Score>
     private lateinit var database: DatabaseReference
     private lateinit var sp: SharedPreferences
-    private lateinit var preferences: Preferences
+    private var preferences: Preferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,10 +72,6 @@ class UserFragment : Fragment() {
         viewManager = LinearLayoutManager(this.context)
         viewManager2 = LinearLayoutManager(this.context)
         sp = activity!!.getSharedPreferences("login", MODE_PRIVATE)
-//        preferences = Gdx.app.getPreferences("Scores")
-     //   val score = preferences.getInteger("newscore")
-     //   Log.d(USER_TAG, "Uj score: $score")
-
 
         //        val scores = ArrayList<String>()
         //        scores.add("newScoreID")

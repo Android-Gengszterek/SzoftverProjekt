@@ -17,7 +17,6 @@
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.10'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.4'
-        classpath 'com.google.firebase:firebase-database:19.5.1'
 
     }
 }
