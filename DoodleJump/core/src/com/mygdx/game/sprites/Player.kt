@@ -17,12 +17,14 @@ class Player{
     var speedUpValue: Float
     var gravityChange:Float
     var turnSpeed: Float
+    var width: Float = 300f
+    var height: Float = 300f
 
     constructor(x:Int, y:Int){
         position = Vector3(x.toFloat(),y.toFloat(),0f)
         velocity = Vector3(0f,0f,0f)
         playerTexture = Texture("player.png")
-        bounds = Rectangle(position.x, position.y, playerTexture.width.toFloat(), playerTexture.height.toFloat())
+        bounds = Rectangle(position.x, position.y, width, height)
         isFalling = true
         speedUpValue = 0f
         gravityChange = 0f
