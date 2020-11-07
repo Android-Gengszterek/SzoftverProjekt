@@ -17,14 +17,15 @@ class Player{
     var speedUpValue: Float
     var gravityChange:Float
     var turnSpeed: Float
-    var width: Float = 300f
-    var height: Float = 300f
+    var width: Float = 200f
+    var height: Float = 200f
+    var isImmune: Boolean = false
 
     constructor(x:Int, y:Int){
         position = Vector3(x.toFloat(),y.toFloat(),0f)
         velocity = Vector3(0f,0f,0f)
         playerTexture = Texture("player.png")
-        bounds = Rectangle(position.x, position.y, width, height)
+        bounds = Rectangle(position.x+120f, position.y, width-70f, height)
         isFalling = true
         speedUpValue = 0f
         gravityChange = 0f
@@ -49,6 +50,9 @@ class Player{
         // if the character's velocity is less then 0 it is falling
         if(velocity.y < 0){
             isFalling = true
+            if(isImmune) {
+                isImmune = false
+            }
         }
 
         velocity.scl(1/dt)
@@ -58,17 +62,33 @@ class Player{
 
     fun goLeft():Unit{
         velocity.x = -400f - turnSpeed
-        playerTexture = Texture("player.png")
+        if(!isImmune) {
+            playerTexture = Texture("player.png")
+        }
     }
 
     fun goRight():Unit{
         velocity.x = 400f + turnSpeed
-        playerTexture = Texture("player2.png")
+        if(!isImmune) {
+            playerTexture = Texture("player2.png")
+        }
     }
 
     fun jump():Unit{
         velocity.y = 1200f + speedUpValue
         isFalling = false
+    }
+
+    fun highJump():Unit{
+        velocity.y = 2500f + speedUpValue
+        isFalling = false
+    }
+
+    fun fly(){
+        velocity.y = 7500f + speedUpValue
+        playerTexture = Texture("playerjetpack.png")
+        isFalling = false
+        isImmune = true
     }
 
     fun stop():Unit{

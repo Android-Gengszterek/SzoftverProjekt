@@ -27,6 +27,8 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     private var platformsDoubler: java.util.ArrayList<Platform>
     private var doublersDeactivated: ArrayList<Boolean>
     private var monster: Monster
+    private var spring: Spring
+    private var jetpack: Jetpack
     var backgroundImagePosition: Vector2
     var backgroundImage2Position: Vector2
     var score:Score
@@ -76,6 +78,10 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         }
 
 
+        spring = Spring(platforms[5])
+        jetpack = Jetpack(platforms[9])
+
+
         // setting the camera position
         cam.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 
@@ -112,7 +118,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             }
         } else{
             // if the player touches te top side of the screen then the character will shoot and change texture
-            if (Gdx.input.y < Gdx.graphics.height/2 && !isShooting) {
+            if (Gdx.input.y < Gdx.graphics.height/2 && !isShooting && !player.isImmune) {
                 player.playerTexture = Texture("player_shooting.png")
                 isShooting = true
                 // reset the bullets location at the player
@@ -135,6 +141,20 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         cam.update()
         score.updateScorePosition()
 
+        // if the character jumps on the jetpack
+        if (jetpack.collide(player.bounds)) {
+            player.fly()
+        }
+
+        if(score.score % 150 == 0){
+            spring.update()
+        }
+
+        // if the character jumps on the spring
+        if ((player.isFalling) && spring.collide(player.bounds)) {
+            player.highJump()
+        }
+
         // after 1000 score the monsters begin to move
         if(score.score > 1000){
             monster.update(dt)
@@ -142,6 +162,11 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
 
         if(monster.monsterPosition.x < 0 ){ monster.turnRight() }
         if(monster.monsterPosition.x + monster.bounds.width > Gdx.graphics.width) monster.turnLeft()
+
+        // if the monster is below the camera view we replace it
+        if(monster.monsterPosition.y < player.position.y - Gdx.graphics.height){
+            monster.replaceMonster()
+        }
 
 
         for(bullet in bullets) {
@@ -173,13 +198,13 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             100 -> makeMoveAndReduceSize(platforms[0], platformsDoubler,doublersDeactivated)
             500 -> makeMoveAndReduceSize(platforms[2], platformsDoubler,doublersDeactivated)
             1000 -> makeMoveAndReduceSize(platforms[6],platformsDoubler,doublersDeactivated)
-            2000 -> makeMoveAndReduceSize(platforms[9],platformsDoubler,doublersDeactivated)
-            2500 -> makeMoveAndReduceSize(platforms[5],platformsDoubler,doublersDeactivated)
-            3000 -> makeMoveAndReduceSize(platforms[3],platformsDoubler,doublersDeactivated)
-            4000 -> makeMoveAndReduceSize(platforms[4],platformsDoubler,doublersDeactivated)
-            8000 -> makeMoveAndReduceSize(platforms[7],platformsDoubler,doublersDeactivated)
-            10000 -> makeMoveAndReduceSize(platforms[1],platformsDoubler,doublersDeactivated)
-            12000 -> makeMoveAndReduceSize(platforms[8],platformsDoubler,doublersDeactivated)
+            1500 -> makeMoveAndReduceSize(platforms[9],platformsDoubler,doublersDeactivated)
+            2000 -> makeMoveAndReduceSize(platforms[5],platformsDoubler,doublersDeactivated)
+            2500 -> makeMoveAndReduceSize(platforms[3],platformsDoubler,doublersDeactivated)
+            3000 -> makeMoveAndReduceSize(platforms[4],platformsDoubler,doublersDeactivated)
+            3500 -> makeMoveAndReduceSize(platforms[7],platformsDoubler,doublersDeactivated)
+            4000 -> makeMoveAndReduceSize(platforms[1],platformsDoubler,doublersDeactivated)
+            4500 -> makeMoveAndReduceSize(platforms[8],platformsDoubler,doublersDeactivated)
         }
 
         //If the platform is moving it will be redirected at the borders
@@ -269,7 +294,11 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, platform.height)
         }
 
-        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, player.width, player.width)
+        spriteBatch.draw(spring.springTexture, spring.springPosition.x, spring.springPosition.y, spring.width, spring.height)
+
+        spriteBatch.draw(jetpack.jetpackTexture, jetpack.jetpackPosition.x, jetpack.jetpackPosition.y, jetpack.width, jetpack.height)
+
+        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, player.width, player.height)
 
         score.bitmapFont.draw(spriteBatch, score.score.toString(), score.scorePosition.x, score.scorePosition.y)
 
