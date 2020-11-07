@@ -26,6 +26,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     private var platforms: java.util.ArrayList<Platform>
     private var platformsDoubler: java.util.ArrayList<Platform>
     private var doublersDeactivated: ArrayList<Boolean>
+    private var monster: Monster
     var backgroundImagePosition: Vector2
     var backgroundImage2Position: Vector2
     var score:Score
@@ -46,6 +47,8 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         platformsDoubler = ArrayList<Platform>()
         doublersDeactivated = ArrayList<Boolean>()
         bullets = ArrayList()
+        monster = Monster()
+
         for (i in 0..BULLET_COUNT){
             bullets.add(Bullet())
         }
@@ -132,6 +135,15 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         cam.update()
         score.updateScorePosition()
 
+        // after 1000 score the monsters begin to move
+        if(score.score > 1000){
+            monster.update(dt)
+        }
+
+        if(monster.monsterPosition.x < 0 ){ monster.turnRight() }
+        if(monster.monsterPosition.x + monster.bounds.width > Gdx.graphics.width) monster.turnLeft()
+
+
         for(bullet in bullets) {
             bullet.update(dt, player)
         }
@@ -147,6 +159,11 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             if (bullet.bulletPosition.y > player.position.y + Gdx.graphics.height) {
                 bullet.isReset = false
                 bullet.bulletPosition.x = -1000f
+                bullet.velocity.y = 0f
+            }
+
+            if(bullet.collide(monster.bounds)){
+                monster.replaceMonster()
             }
         }
 
@@ -176,7 +193,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
 
 
         // if the player falls below the camera's y position then the game ends and a new state will start
-        if((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height/2))){
+        if(((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height/2))) || monster.collide(player)){
             gameStateManager.pop()
             gameStateManager.push(PlayState(gameStateManager))
         }
@@ -242,14 +259,14 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
 
         for(platform in platforms){
             if(!platform.isWood) {
-                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
+                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, platform.height)
             } else{
-                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 200f)
+                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, 200f)
             }
         }
 
         for(platform in platformsDoubler){
-            spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
+            spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, platform.height)
         }
 
         spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, player.width, player.width)
@@ -259,6 +276,8 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         for(bullet in bullets) {
             spriteBatch.draw(bullet.bulletTexture, bullet.bulletPosition.x, bullet.bulletPosition.y, 50f, 50f)
         }
+
+        spriteBatch.draw(monster.monsterTexture, monster.monsterPosition.x, monster.monsterPosition.y, monster.width, monster.height)
 
         spriteBatch.end()
     }
