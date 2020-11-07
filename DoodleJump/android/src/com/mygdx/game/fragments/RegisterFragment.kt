@@ -108,6 +108,17 @@ class RegisterFragment : Fragment() {
         database.child("users").child(key).setValue(user)
                 .addOnSuccessListener {
                     Toast.makeText(this.context, "Registration success", Toast.LENGTH_LONG).show()
+                    val userFragment = UserFragment()
+                    val bundle = Bundle()
+                    bundle.putSerializable(USER_CLASS, myUserKey)
+                    userFragment.arguments = bundle
+
+                    fragmentManager?.beginTransaction()?.replace(
+                            R.id.fragment_container,
+                            userFragment,
+                            LOGIN_TAG
+                    )?.commit()
+
                 }
                 .addOnFailureListener {
                     Toast.makeText(this.context, "Registration fail", Toast.LENGTH_LONG).show()
@@ -124,16 +135,6 @@ class RegisterFragment : Fragment() {
                         userNameEditText.text.toString(),
                         passwordEditText.text.toString(),
                 )
-                val userFragment = UserFragment()
-                val bundle = Bundle()
-                bundle.putSerializable(USER_CLASS, myUserKey)
-                userFragment.arguments = bundle
-
-                fragmentManager?.beginTransaction()?.replace(
-                        R.id.fragment_container,
-                        userFragment,
-                        LOGIN_TAG
-                )?.commit()
             }
         }
         else {

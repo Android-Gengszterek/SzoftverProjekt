@@ -1,6 +1,7 @@
 package com.mygdx.game.sprites
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
@@ -14,11 +15,12 @@ class Player{
     var playerTexture: Texture
     var bounds: Rectangle
     var isFalling: Boolean
+    var jumpSound: Sound
     var speedUpValue: Float
     var gravityChange:Float
     var turnSpeed: Float
-    var width: Float = 300f
-    var height: Float = 300f
+    var width: Float = 200f
+    var height: Float = 200f
 
     constructor(x:Int, y:Int){
         position = Vector3(x.toFloat(),y.toFloat(),0f)
@@ -26,6 +28,7 @@ class Player{
         playerTexture = Texture("player.png")
         bounds = Rectangle(position.x, position.y, width, height)
         isFalling = true
+        jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump-arcade.mp3"))
         speedUpValue = 0f
         gravityChange = 0f
         turnSpeed = 0f
@@ -67,6 +70,7 @@ class Player{
     }
 
     fun jump():Unit{
+        jumpSound.play()
         velocity.y = 1200f + speedUpValue
         isFalling = false
     }

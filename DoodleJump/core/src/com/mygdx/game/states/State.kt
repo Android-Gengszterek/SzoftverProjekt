@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
 
 abstract class State{
-    protected lateinit var cam: OrthographicCamera
-    protected lateinit var mouse: Vector3
-    protected lateinit var gameStateManager: GameStateManager
+    protected var cam: OrthographicCamera
+    protected var mouse: Vector3
+    protected var gameStateManager: GameStateManager
 
 
     protected constructor(gameStateManager: GameStateManager){
