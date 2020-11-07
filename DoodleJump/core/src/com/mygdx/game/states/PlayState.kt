@@ -4,10 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
-import com.mygdx.game.sprites.Floor
-import com.mygdx.game.sprites.Platform
-import com.mygdx.game.sprites.Player
-import com.mygdx.game.sprites.Score
+import com.mygdx.game.sprites.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -17,9 +14,12 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         private var PLATFORM_SPACING:Float = 500f
         private var PLATFORM_COUNT:Int = 10
         private var PLATFORM_HEIGHT:Float = 60f
+        private var bulletIndex: Int = 0
+        private var BULLET_COUNT = 5
     }
     private var backgroundImage: Texture
     private var backgroundImage2: Texture
+    private var bullets: ArrayList<Bullet>
     private var floor: Floor
     private var player: Player
     private lateinit var rand: Random
@@ -30,6 +30,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     var backgroundImage2Position: Vector2
     var score:Score
     var allPlatforms:List<Platform>
+    var isShooting: Boolean = false
 
     //initializing attributes
     init {
@@ -44,6 +45,10 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         platforms = ArrayList<Platform>()
         platformsDoubler = ArrayList<Platform>()
         doublersDeactivated = ArrayList<Boolean>()
+        bullets = ArrayList()
+        for (i in 0..BULLET_COUNT){
+            bullets.add(Bullet())
+        }
 
         rand = Random()
         var randNumber = rand.nextFloat() * PLATFORM_COUNT
@@ -84,17 +89,33 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
                 player.jump()
             }
             //if the player touches the left side of the screen the character goes left
-            if (Gdx.input.x < Gdx.graphics.width / 2) {
+            if ((Gdx.input.x < Gdx.graphics.width / 2) && (Gdx.input.y > Gdx.graphics.height/2) ) {
                 player.goLeft()
             }
             // if the player touches the right side of the screen the character goes right
-            if (Gdx.input.x > Gdx.graphics.width / 2) {
+            if ((Gdx.input.x > Gdx.graphics.width / 2) && (Gdx.input.y > Gdx.graphics.height/2)) {
                 player.goRight()
             }
+
+
         }
         //if the player does not touch the screen then the character will stop moving in the X axis
         if(!Gdx.input.isTouched()){
             player.stop()
+            // if the character was shooting we change the texture back
+            if(isShooting) {
+                isShooting = false
+                player.playerTexture = Texture("player.png")
+            }
+        } else{
+            // if the player touches te top side of the screen then the character will shoot and change texture
+            if (Gdx.input.y < Gdx.graphics.height/2 && !isShooting) {
+                player.playerTexture = Texture("player_shooting.png")
+                isShooting = true
+                // reset the bullets location at the player
+                bullets[bulletIndex].reset(player)
+                bulletIndex = (bulletIndex + 1) % BULLET_COUNT
+            }
         }
 
 
@@ -110,11 +131,25 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         player.update(dt)
         cam.update()
         score.updateScorePosition()
+
+        for(bullet in bullets) {
+            bullet.update(dt, player)
+        }
+
         if(platforms[platforms.size-1].platformPosition.y > cam.position.y - (Gdx.graphics.height)) {
             platforms[platforms.size - 1].update(dt)
         }else{
             platforms[platforms.size - 1].stopFall()
         }
+
+        for(bullet in bullets) {
+            // if the bullet is off the screen itt will be replaced at the side of the screen out of view
+            if (bullet.bulletPosition.y > player.position.y + Gdx.graphics.height) {
+                bullet.isReset = false
+                bullet.bulletPosition.x = -1000f
+            }
+        }
+
 
         // If the player reaches the score a certain platform will move and a certain platform will be deleted
         when(score.score){
@@ -217,9 +252,13 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, 200f, 60f)
         }
 
-        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, 300f, 300f)
+        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, player.width, player.width)
 
         score.bitmapFont.draw(spriteBatch, score.score.toString(), score.scorePosition.x, score.scorePosition.y)
+
+        for(bullet in bullets) {
+            spriteBatch.draw(bullet.bulletTexture, bullet.bulletPosition.x, bullet.bulletPosition.y, 50f, 50f)
+        }
 
         spriteBatch.end()
     }
