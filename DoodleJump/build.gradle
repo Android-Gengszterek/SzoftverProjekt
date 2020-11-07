@@ -60,6 +60,7 @@ project(":desktop") {
 
 project(":android") {
     apply plugin: "android"
+    apply plugin: "com.android.application"
     apply plugin: "kotlin-android"
     apply plugin: 'com.google.gms.google-services'
 
@@ -102,12 +103,12 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
        // implementation "pl.mk5.gdx-fireapp:gdx-fireapp-core:$gdxFireappVersion"
-        implementation 'com.firebaseui:firebase-ui-database:6.4.0'
+       // implementation 'com.firebaseui:firebase-ui-database:6.4.0'
 
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     }
 
-    apply plugin: 'com.google.gms.google-services'
+  //  apply plugin: 'com.google.gms.google-services'
 }
 
 project(":ios") {
