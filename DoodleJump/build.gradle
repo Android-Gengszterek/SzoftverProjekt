@@ -60,7 +60,10 @@ project(":desktop") {
 
 project(":android") {
     apply plugin: "android"
+    apply plugin: "com.android.application"
     apply plugin: "kotlin-android"
+    apply plugin: 'com.google.gms.google-services'
+
 
     configurations { natives }
 
@@ -84,6 +87,10 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+
+        implementation platform('com.google.firebase:firebase-bom:26.0.0')
+        implementation 'com.google.firebase:firebase-analytics-ktx'
+        implementation 'com.google.firebase:firebase-database-ktx'
     }
 }
 
@@ -95,8 +102,13 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+       // implementation "pl.mk5.gdx-fireapp:gdx-fireapp-core:$gdxFireappVersion"
+       // implementation 'com.firebaseui:firebase-ui-database:6.4.0'
+
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     }
+
+  //  apply plugin: 'com.google.gms.google-services'
 }
 
 project(":ios") {

@@ -15,7 +15,7 @@ class GameStateManager{
     }
 
     fun pop():Unit{
-        states.pop()
+        states.pop().dispose()
     }
 
     fun set(state:State){

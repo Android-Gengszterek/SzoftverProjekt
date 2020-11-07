@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Preferences
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -41,6 +43,7 @@ class UserFragment : Fragment() {
     private lateinit var allScores: ArrayList<Score>
     private lateinit var database: DatabaseReference
     private lateinit var sp: SharedPreferences
+    private var preferences: Preferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +72,6 @@ class UserFragment : Fragment() {
         viewManager = LinearLayoutManager(this.context)
         viewManager2 = LinearLayoutManager(this.context)
         sp = activity!!.getSharedPreferences("login", MODE_PRIVATE)
-
 
         //        val scores = ArrayList<String>()
         //        scores.add("newScoreID")
