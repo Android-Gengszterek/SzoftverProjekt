@@ -18,20 +18,19 @@ class Platform {
     var moveSpeed:Float
     var isMooving: Boolean
     var uniqueSpacingMultiplier: Float = 500f
+    var width: Float = 150f
+    var height: Float = 40f
 
-    companion object{
-        private val GRAVITY:Float = -15f
-    }
 
     constructor(y: Float,texture_picture: String, isWood: Boolean){
         velocity = Vector2(0f,0f)
         greenPlatformTexture = Texture(texture_picture)
         rand = Random()
-        var randNumber:Float = rand.nextFloat() * (Gdx.graphics.width-500f) + 200f
+        var randNumber:Float = rand.nextFloat() * (Gdx.graphics.width-500f) + width
 
         platformPosition = Vector2(randNumber , y)
 
-        bounds = Rectangle(platformPosition.x, platformPosition.y,200f, 100f )
+        bounds = Rectangle(platformPosition.x, platformPosition.y,width, height/2 )
         this.isWood = isWood
         isMooving = false
         fallSpeed = 0f
@@ -40,20 +39,20 @@ class Platform {
     }
 
     fun reposition(y:Float):Unit{
-        platformPosition.set(rand.nextFloat() * (Gdx.graphics.width-500f) + 200f,y)
-        bounds.set(platformPosition.x, platformPosition.y,200f,60f)
+        platformPosition.set(rand.nextFloat() * (Gdx.graphics.width-500f) + width,y)
+        bounds.set(platformPosition.x, platformPosition.y,width,height)
     }
 
     fun repositionWoodenAlongX(y:Float):Unit{
-        platformPosition.set(rand.nextFloat() * (Gdx.graphics.width-500f) + 200f,y)
-        bounds.set(platformPosition.x, platformPosition.y,200f,60f)
+        platformPosition.set(rand.nextFloat() * (Gdx.graphics.width-500f) + width,y)
+        bounds.set(platformPosition.x, platformPosition.y,width,height)
     }
 
 
     fun collide(bound: Rectangle):Boolean{
         var position: Vector2 = Vector2()
         bound.getPosition(position)
-        if((position.y > platformPosition.y) && (position.y < platformPosition.y + 20) && (position.x > (platformPosition.x-250f)) && (position.x < platformPosition.x+60f)){
+        if((position.y > platformPosition.y) && (position.y < platformPosition.y + 20) && (position.x > (platformPosition.x-270f)) && (position.x < platformPosition.x+60f)){
             return true
         }
         return false
