@@ -28,7 +28,7 @@ class MyAdapter(private val myDataset: ArrayList<Score>) : RecyclerView.Adapter<
         val currentItem = myDataset[position]
 
         holder.numberTextView.text = "$position."
-        holder.valueTextView.text = currentItem.scoreValue
+        holder.valueTextView.text = currentItem.scoreValue.toString()
     }
 
     override fun getItemCount() = myDataset.size

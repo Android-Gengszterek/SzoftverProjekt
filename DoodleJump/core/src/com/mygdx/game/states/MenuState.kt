@@ -32,8 +32,9 @@ class MenuState(gameStateManager: GameStateManager, val scoreValue: Int) : State
         cam.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         newScore = Score(cam,200, Color.GREEN, 10f)
 
-        myPreferences = Gdx.app.getPreferences("Scores")
-        myPreferences.putInteger("newscore", scoreValue)
+        myPreferences = Gdx.app.getPreferences("MyScores")
+        val myScores = myPreferences.get()
+        myPreferences.putInteger("${myScores.size}", scoreValue)
         myPreferences.flush()
         System.out.println("Score: $scoreValue")
 
