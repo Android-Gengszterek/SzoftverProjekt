@@ -37,7 +37,7 @@ class LeaderBoardAdapter(private val myDataset: ArrayList<Score>) : RecyclerView
         val db = database.child("users")
 
         holder.numberTextView.text = "$position."
-        holder.valueTextView.text = currentItem.scoreValue
+        holder.valueTextView.text = currentItem.scoreValue.toString()
         //holder.numberTextView.text = database.child("users").child(currentItem.userId).child("userName").value
         db.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

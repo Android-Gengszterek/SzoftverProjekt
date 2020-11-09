@@ -67,8 +67,7 @@ class LoginFragment : Fragment() {
                     val key = d.key.toString()
                     val username = d.child("userName").value.toString()
                     val password = d.child("password").value.toString()
-                    val scores = d.child("scores").value as? ArrayList<String>
-                    val user = User(key, username, password, scores)
+                    val user = User(key, username, password)
                     users.add(user)
                     Log.d("Users", user.toString())
                 }
