@@ -3,11 +3,11 @@ package com.mygdx.game.states
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import java.util.*
 
-class GameStateManager{
+class GameStateManager() {
     private var states: Stack<State>
 
-    constructor(){
-        states = Stack<State>();
+    init {
+        states = Stack<State>()
     }
 
     fun push(state: State): Unit{
