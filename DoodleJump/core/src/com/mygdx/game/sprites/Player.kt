@@ -77,6 +77,20 @@ class Player{
         }
     }
 
+    fun goStrongLeft():Unit{
+        velocity.x = -600f - turnSpeed
+        if(!isImmune) {
+            playerTexture = Texture("player.png")
+        }
+    }
+
+    fun goStrongRight():Unit{
+        velocity.x = 600f + turnSpeed
+        if(!isImmune) {
+            playerTexture = Texture("player2.png")
+        }
+    }
+
     fun jump():Unit{
         jumpSound.play()
         velocity.y = 1200f + speedUpValue
