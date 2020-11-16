@@ -17,6 +17,8 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         private var PLATFORM_HEIGHT:Float = 60f
         private var bulletIndex: Int = 0
         private var BULLET_COUNT = 5
+        private var GAME_PLAY = 1
+        private var GAME_PAUSE = 0
     }
     private var backgroundImage: Texture
     private var backgroundImage2: Texture
@@ -33,9 +35,13 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     var backgroundImagePosition: Vector2
     private var backgroundImage2Position: Vector2
     private var score: Score
+    private var pause: PauseButton
     private var music: Music
     var allPlatforms:List<Platform>
     var isShooting: Boolean = false
+    var gameState = GAME_PLAY
+    var pauseState: PauseState
+    var released = true
 
     //initializing attributes
     init {
@@ -51,11 +57,14 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         floor = Floor()
         player = Player(Gdx.graphics.width / 2 - 200, 150)
         score = Score(cam)
+        pause = PauseButton(cam)
         platforms = ArrayList<Platform>()
         platformsDoubler = ArrayList<Platform>()
         doublersDeactivated = ArrayList<Boolean>()
         bullets = ArrayList()
         monster = Monster()
+
+        pauseState = PauseState(cam)
 
         for (i in 0..BULLET_COUNT){
             bullets.add(Bullet())
@@ -97,39 +106,88 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     }
 
     override fun handleInput() {
-        // if the player touches the screen
-        if(Gdx.input.justTouched()) {
-            // if the players position is low, with a tap can start the jumping
-            if(player.position.y < 400f){
-                player.jump()
+
+        if(gameState == GAME_PLAY) {
+            // if the player activated the control by gyroscope
+            if(pauseState.isGyroscopeActive ){
+                // the character goes on the direction of the tilting
+                if (Gdx.input.accelerometerX > 1) {
+                    player.goStrongLeft()
+                }else if (Gdx.input.accelerometerX < -1) {
+                    player.goStrongRight()
+                }
+                // if the position of the telephone is close to the horizontal(in portraid mode) then the character stops
+                if(Gdx.input.accelerometerX < 0.5 && Gdx.input.accelerometerX > -0.5){
+                    player.stop()
+                }
             }
-            //if the player touches the left side of the screen the character goes left
-            if ((Gdx.input.x < Gdx.graphics.width / 2) && (Gdx.input.y > Gdx.graphics.height/2) ) {
-                player.goLeft()
-            }
-            // if the player touches the right side of the screen the character goes right
-            if ((Gdx.input.x > Gdx.graphics.width / 2) && (Gdx.input.y > Gdx.graphics.height/2)) {
-                player.goRight()
+            // if the player touches the screen
+            if (Gdx.input.justTouched()) {
+                // if the players position is low, with a tap can start the jumping
+                if (player.position.y < 400f) {
+                    player.jump()
+                }
+                if(!pauseState.isGyroscopeActive) {
+                    //if the player touches the left side of the screen the character goes left
+                    if ((Gdx.input.x < Gdx.graphics.width / 2) && (Gdx.input.y > Gdx.graphics.height / 2)) {
+                        player.goLeft()
+                    }
+                    // if the player touches the right side of the screen the character goes right
+                    if ((Gdx.input.x > Gdx.graphics.width / 2) && (Gdx.input.y > Gdx.graphics.height / 2)) {
+                        player.goRight()
+                    }
+                }
             }
 
+            //if the player does not touch the screen then the character will stop moving in the X axis
+            if (!Gdx.input.isTouched()) {
+                if(!pauseState.isGyroscopeActive) {
+                    player.stop()
+                }
+                // if the character was shooting we change the texture back
+                if (isShooting) {
+                    isShooting = false
+                    player.playerTexture = Texture("player.png")
+                }
+            } else {
+                // if the player touches te top side of the screen then the character will shoot and change texture
+                if (Gdx.input.y < Gdx.graphics.height / 2 && Gdx.input.y > 200 && !isShooting && !player.isImmune) {
+                    player.playerTexture = Texture("player_shooting.png")
+                    isShooting = true
+                    // reset the bullets location at the player
+                    bullets[bulletIndex].reset(player)
+                    bulletIndex = (bulletIndex + 1) % BULLET_COUNT
+                }
 
-        }
-        //if the player does not touch the screen then the character will stop moving in the X axis
-        if(!Gdx.input.isTouched()){
-            player.stop()
-            // if the character was shooting we change the texture back
-            if(isShooting) {
-                isShooting = false
-                player.playerTexture = Texture("player.png")
+                // if the player clicks on the pause button the pause menu will be shown
+                if (Gdx.input.y < 200 && Gdx.input.x > Gdx.graphics.width - 150f) {
+                    gameState = GAME_PAUSE
+
+                }
             }
-        } else{
-            // if the player touches te top side of the screen then the character will shoot and change texture
-            if (Gdx.input.y < Gdx.graphics.height/2 && !isShooting && !player.isImmune) {
-                player.playerTexture = Texture("player_shooting.png")
-                isShooting = true
-                // reset the bullets location at the player
-                bullets[bulletIndex].reset(player)
-                bulletIndex = (bulletIndex + 1) % BULLET_COUNT
+        } else if(gameState == GAME_PAUSE){
+            // with the back button the player can resume the game
+            if (Gdx.input.y < 200 && Gdx.input.x < 150f && Gdx.input.isTouched()) {
+                if(!pauseState.isInformationsShown && released){
+                    gameState = GAME_PLAY
+                    released = false
+                } else{
+                    pauseState.hideInformations()
+                    released = false
+                }
+            }
+
+            if (Gdx.input.y > Gdx.graphics.height-200 && Gdx.input.x > Gdx.graphics.width - 150f) {
+                pauseState.showInformations()
+            }
+            // if the player clicks on the switch button he can activate is deactivate the gyroscope controls
+            if (Gdx.input.isTouched() && released && (Gdx.input.x < (Gdx.graphics.width/2+300f)) && (Gdx.input.x > (Gdx.graphics.width/2-300f))
+                    && Gdx.input.y > 450 && Gdx.input.y < 650) {
+                pauseState.isGyroscopeActive = !pauseState.isGyroscopeActive
+                released = false
+            }
+            if(!Gdx.input.isTouched()){
+                released = true
             }
         }
 
@@ -137,145 +195,154 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     }
 
     override fun update(dt: Float) {
+        if(gameState == GAME_PLAY) {
+            // in every update we handle the input and update the background and the players position if it is necessary
+            updateScore()
+            handleInput()
+            updateBackground()
+            updateSpeed()
+            player.update(dt)
+            cam.update()
+            score.updateScorePosition()
+            pause.updateButtonPosition()
 
-        // in every update we handle the input and update the background and the players position if it is necessary
-        updateScore()
-        handleInput()
-        updateBackground()
-        updateSpeed()
-        player.update(dt)
-        cam.update()
-        score.updateScorePosition()
-
-        // if the character jumps on the jetpack
-        if (jetpack.collide(player.bounds)) {
-            player.fly()
-        }
-
-        if(score.score % 150 == 0){
-            spring.update()
-        }
-
-        // if the character jumps on the spring
-        if ((player.isFalling) && spring.collide(player.bounds)) {
-            player.highJump()
-        }
-
-        // after 1000 score the monsters begin to move
-        if(score.score > 1000){
-            monster.update(dt)
-        }
-
-        if(monster.monsterPosition.x < 0 ){ monster.turnRight() }
-        if(monster.monsterPosition.x + monster.bounds.width > Gdx.graphics.width) monster.turnLeft()
-
-        // if the monster is below the camera view we replace it
-        if(monster.monsterPosition.y < player.position.y - Gdx.graphics.height){
-            monster.replaceMonster()
-        }
-
-
-        for(bullet in bullets) {
-            bullet.update(dt, player)
-        }
-
-        if(platforms[platforms.size-1].platformPosition.y > cam.position.y - (Gdx.graphics.height)) {
-            platforms[platforms.size - 1].update(dt)
-        }else{
-            platforms[platforms.size - 1].stopFall()
-        }
-
-        for(bullet in bullets) {
-            // if the bullet is off the screen itt will be replaced at the side of the screen out of view
-            if (bullet.bulletPosition.y > player.position.y + Gdx.graphics.height) {
-                bullet.isReset = false
-                bullet.bulletPosition.x = -1000f
-                bullet.velocity.y = 0f
+            // if the character jumps on the jetpack
+            if (jetpack.collide(player.bounds)) {
+                player.fly()
             }
 
-            if(bullet.collide(monster.bounds)){
+            if (score.score % 150 == 0) {
+                spring.update()
+            }
+
+            // if the character jumps on the spring
+            if ((player.isFalling) && spring.collide(player.bounds)) {
+                player.highJump()
+            }
+
+            // after 1000 score the monsters begin to move
+            if (score.score > 1000) {
+                monster.update(dt)
+            }
+
+            if (monster.monsterPosition.x < 0) {
+                monster.turnRight()
+            }
+            if (monster.monsterPosition.x + monster.bounds.width > Gdx.graphics.width) monster.turnLeft()
+
+            // if the monster is below the camera view we replace it
+            if (monster.monsterPosition.y < player.position.y - Gdx.graphics.height) {
                 monster.replaceMonster()
             }
-        }
 
 
-        // If the player reaches the score a certain platform will move and a certain platform will be deleted
-        when(score.score){
-            100 -> makeMoveAndReduceSize(platforms[0], platformsDoubler,doublersDeactivated)
-            500 -> makeMoveAndReduceSize(platforms[2], platformsDoubler,doublersDeactivated)
-            1000 -> makeMoveAndReduceSize(platforms[6],platformsDoubler,doublersDeactivated)
-            1500 -> makeMoveAndReduceSize(platforms[9],platformsDoubler,doublersDeactivated)
-            2000 -> makeMoveAndReduceSize(platforms[5],platformsDoubler,doublersDeactivated)
-            2500 -> makeMoveAndReduceSize(platforms[3],platformsDoubler,doublersDeactivated)
-            3000 -> makeMoveAndReduceSize(platforms[4],platformsDoubler,doublersDeactivated)
-            3500 -> makeMoveAndReduceSize(platforms[7],platformsDoubler,doublersDeactivated)
-            4000 -> makeMoveAndReduceSize(platforms[1],platformsDoubler,doublersDeactivated)
-            4500 -> makeMoveAndReduceSize(platforms[8],platformsDoubler,doublersDeactivated)
-        }
-
-        //If the platform is moving it will be redirected at the borders
-        for(platform in platforms){
-            platform.update(dt)
-            if(!platform.isWood){
-                if(platform.platformPosition.x < 0 ){ platform.turnRight() }
-                if(platform.platformPosition.x + platform.bounds.width > Gdx.graphics.width) platform.turnLeft()
+            for (bullet in bullets) {
+                bullet.update(dt, player)
             }
-        }
+
+            if (platforms[platforms.size - 1].platformPosition.y > cam.position.y - (Gdx.graphics.height)) {
+                platforms[platforms.size - 1].update(dt)
+            } else {
+                platforms[platforms.size - 1].stopFall()
+            }
+
+            for (bullet in bullets) {
+                // if the bullet is off the screen itt will be replaced at the side of the screen out of view
+                if (bullet.bulletPosition.y > player.position.y + Gdx.graphics.height) {
+                    bullet.isReset = false
+                    bullet.bulletPosition.x = -1000f
+                    bullet.velocity.y = 0f
+                }
+
+                if (bullet.collide(monster.bounds)) {
+                    monster.replaceMonster()
+                }
+            }
 
 
-        // if the player falls below the camera's y position then the game ends and a new state will start
-        if(((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height/2))) || monster.collide(player)){
-            gameStateManager.pop()
-            //Here window coming
-            music.stop()
-            gameStateManager.push(MenuState(gameStateManager, score.score))
-           // gameStateManager.push(PlayState(gameStateManager))
-        }
+            // If the player reaches the score a certain platform will move and a certain platform will be deleted
+            when (score.score) {
+                100 -> makeMoveAndReduceSize(platforms[0], platformsDoubler, doublersDeactivated)
+                500 -> makeMoveAndReduceSize(platforms[2], platformsDoubler, doublersDeactivated)
+                1000 -> makeMoveAndReduceSize(platforms[6], platformsDoubler, doublersDeactivated)
+                1500 -> makeMoveAndReduceSize(platforms[9], platformsDoubler, doublersDeactivated)
+                2000 -> makeMoveAndReduceSize(platforms[5], platformsDoubler, doublersDeactivated)
+                2500 -> makeMoveAndReduceSize(platforms[3], platformsDoubler, doublersDeactivated)
+                3000 -> makeMoveAndReduceSize(platforms[4], platformsDoubler, doublersDeactivated)
+                3500 -> makeMoveAndReduceSize(platforms[7], platformsDoubler, doublersDeactivated)
+                4000 -> makeMoveAndReduceSize(platforms[1], platformsDoubler, doublersDeactivated)
+                4500 -> makeMoveAndReduceSize(platforms[8], platformsDoubler, doublersDeactivated)
+            }
 
-        // if the players y position is greater than the height of the camera, then the camera will follow the player
-        if(player.position.y > Gdx.graphics.height/2 && (player.position.y > cam.position.y)) {
-            cam.position.y = player.position.y
-        }
+            //If the platform is moving it will be redirected at the borders
+            for (platform in platforms) {
+                platform.update(dt)
+                if (!platform.isWood) {
+                    if (platform.platformPosition.x < 0) {
+                        platform.turnRight()
+                    }
+                    if (platform.platformPosition.x + platform.bounds.width > Gdx.graphics.width) platform.turnLeft()
+                }
+            }
 
-        // if the player will get contact with the ground at the beginning of the game the player will stop on the ground
-        if(floor.collide(player.bounds)){
-            player.stopFall()
-        }
 
-        for(platform in platforms){
-            // if the platform isnt wood platform
-            if(!platform.isWood) {
+            // if the player falls below the camera's y position then the game ends and a new state will start
+            if (((cam.position.y > Gdx.graphics.height) && (player.position.y < (cam.position.y - Gdx.graphics.height / 2))) || monster.collide(player)) {
+                gameStateManager.pop()
+                //Here window coming
+                music.stop()
+                gameStateManager.push(MenuState(gameStateManager, score.score))
+                // gameStateManager.push(PlayState(gameStateManager))
+            }
+
+            // if the players y position is greater than the height of the camera, then the camera will follow the player
+            if (player.position.y > Gdx.graphics.height / 2 && (player.position.y > cam.position.y)) {
+                cam.position.y = player.position.y
+            }
+
+            // if the player will get contact with the ground at the beginning of the game the player will stop on the ground
+            if (floor.collide(player.bounds)) {
+                player.stopFall()
+            }
+
+            for (platform in platforms) {
+                // if the platform isnt wood platform
+                if (!platform.isWood) {
+                    // if the player is falling and touches any of the platforms then the character will jump
+                    if ((player.isFalling) && platform.collide(player.bounds)) {
+                        player.jump()
+                    }
+                    // if the platforms are below the camera's viewport then the platforms will be replaced above
+                    if (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT) {
+                        platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT)))
+                    }
+                } else {
+                    // if the player touches the wood platform he will fall with the wood platform
+                    if ((player.isFalling) && platform.collide(player.bounds)) {
+                        platform.platformFall()
+                    }
+                    // every 50 score the wooden platform will be replaced checking itt will not collide with any other platforms
+                    if ((score.score % 50 == 0) && (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT)) {
+                        platform.reposition(player.position.y + (Gdx.graphics.height / 2))
+                        repositionIfCollideWithOtherPlatforms(platform, allPlatforms, false)
+                    }
+                }
+            }
+            for (platform in platformsDoubler) {
+                // if the platform isnt wood platform
                 // if the player is falling and touches any of the platforms then the character will jump
                 if ((player.isFalling) && platform.collide(player.bounds)) {
                     player.jump()
                 }
                 // if the platforms are below the camera's viewport then the platforms will be replaced above
-                if (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT) {
-                    platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING + PLATFORM_HEIGHT)))
-                }
-            } else{
-                // if the player touches the wood platform he will fall with the wood platform
-                if ((player.isFalling) && platform.collide(player.bounds)) {
-                    platform.platformFall()
-                }
-                // every 50 score the wooden platform will be replaced checking itt will not collide with any other platforms
-                if (( score.score % 50 == 0) && (player.position.y - (cam.viewportHeight / 2) > platform.platformPosition.y + PLATFORM_HEIGHT)) {
-                    platform.reposition(player.position.y + (Gdx.graphics.height/2))
-                    repositionIfCollideWithOtherPlatforms(platform,allPlatforms,false)
+                if (player.position.y - (Gdx.graphics.height / 2) > platform.platformPosition.y + PLATFORM_HEIGHT) {
+                    //platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING * (1+platform.uniqueSpacingMultiplier) + PLATFORM_HEIGHT)))
+                    repositionIfCollideWithOtherPlatforms(platform, allPlatforms, true)
                 }
             }
-        }
-        for(platform in platformsDoubler) {
-            // if the platform isnt wood platform
-            // if the player is falling and touches any of the platforms then the character will jump
-            if ((player.isFalling) && platform.collide(player.bounds)) {
-                player.jump()
-            }
-            // if the platforms are below the camera's viewport then the platforms will be replaced above
-            if (player.position.y - (Gdx.graphics.height/2) > platform.platformPosition.y + PLATFORM_HEIGHT) {
-                //platform.reposition(platform.platformPosition.y + (PLATFORM_COUNT * (PLATFORM_SPACING * (1+platform.uniqueSpacingMultiplier) + PLATFORM_HEIGHT)))
-                repositionIfCollideWithOtherPlatforms(platform,allPlatforms,true)
-            }
+        } else if(gameState == GAME_PAUSE){
+            handleInput()
+            pauseState.updatePauseState(cam.position.x, cam.position.y)
         }
     }
 
@@ -283,40 +350,50 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
     // in the render we draw every element on the screen
     override fun render(spriteBatch: SpriteBatch) {
 
+
         spriteBatch.projectionMatrix = cam.combined
         spriteBatch.begin()
+        if(gameState == GAME_PLAY) {
+            spriteBatch.draw(backgroundImage, backgroundImagePosition.x, backgroundImagePosition.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            spriteBatch.draw(backgroundImage2, backgroundImage2Position.x, backgroundImage2Position.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            spriteBatch.draw(floor.floorTexture, 0f - (Gdx.graphics.width / 2), floor.floorPosition.y, Gdx.graphics.width.toFloat() * 2, 500f)
 
-        spriteBatch.draw(backgroundImage, backgroundImagePosition.x, backgroundImagePosition.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        spriteBatch.draw(backgroundImage2, backgroundImage2Position.x, backgroundImage2Position.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        spriteBatch.draw(floor.floorTexture, 0f - (Gdx.graphics.width / 2), floor.floorPosition.y, Gdx.graphics.width.toFloat() * 2, 500f)
 
-
-        for(platform in platforms){
-            if(!platform.isWood) {
-                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, platform.height)
-            } else{
-                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, 200f)
+            for (platform in platforms) {
+                if (!platform.isWood) {
+                    spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, platform.height)
+                } else {
+                    spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, 200f)
+                }
             }
+
+            for (platform in platformsDoubler) {
+                spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, platform.height)
+            }
+
+            spriteBatch.draw(spring.springTexture, spring.springPosition.x, spring.springPosition.y, spring.width, spring.height)
+
+            spriteBatch.draw(jetpack.jetpackTexture, jetpack.jetpackPosition.x, jetpack.jetpackPosition.y, jetpack.width, jetpack.height)
+
+            spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, player.width, player.height)
+
+            score.bitmapFont.draw(spriteBatch, score.score.toString(), score.scorePosition.x, score.scorePosition.y)
+
+            pause.bitmapFont.draw(spriteBatch, "II", pause.pausePosition.x, pause.pausePosition.y)
+
+            for (bullet in bullets) {
+                spriteBatch.draw(bullet.bulletTexture, bullet.bulletPosition.x, bullet.bulletPosition.y, 50f, 50f)
+            }
+
+            spriteBatch.draw(monster.monsterTexture, monster.monsterPosition.x, monster.monsterPosition.y, monster.width, monster.height)
         }
-
-        for(platform in platformsDoubler){
-            spriteBatch.draw(platform.greenPlatformTexture, platform.platformPosition.x, platform.platformPosition.y, platform.width, platform.height)
+        if(gameState == GAME_PAUSE) {
+           /* var background = Texture("background.png")
+            spriteBatch.draw(background, cam.position.x - cam.viewportWidth / 2, cam.position.y-cam.viewportHeight/2, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            var back = Texture("circled-left.png")
+            spriteBatch.draw(back, 0f, pause.pausePosition.y-150f, 200f,200f)*/
+            pauseState.render(spriteBatch)
         }
-
-        spriteBatch.draw(spring.springTexture, spring.springPosition.x, spring.springPosition.y, spring.width, spring.height)
-
-        spriteBatch.draw(jetpack.jetpackTexture, jetpack.jetpackPosition.x, jetpack.jetpackPosition.y, jetpack.width, jetpack.height)
-
-        spriteBatch.draw(player.playerTexture, player.position.x, player.position.y, player.width, player.height)
-
-        score.bitmapFont.draw(spriteBatch, score.score.toString(), score.scorePosition.x, score.scorePosition.y)
-
-        for(bullet in bullets) {
-            spriteBatch.draw(bullet.bulletTexture, bullet.bulletPosition.x, bullet.bulletPosition.y, 50f, 50f)
-        }
-
-        spriteBatch.draw(monster.monsterTexture, monster.monsterPosition.x, monster.monsterPosition.y, monster.width, monster.height)
-
         spriteBatch.end()
     }
 
@@ -329,6 +406,14 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
         for(platform in platforms){
             platform.greenPlatformTexture.dispose()
         }
+
+        for(platform in platformsDoubler){
+            platform.greenPlatformTexture.dispose()
+        }
+        monster.monsterTexture.dispose()
+        spring.springTexture.dispose()
+        jetpack.jetpackTexture.dispose()
+        pauseState.dispose()
     }
 
     // if the camera's position is greater than the height of the background image, the background image will be placed at the top
