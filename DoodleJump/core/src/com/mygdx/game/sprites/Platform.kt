@@ -10,7 +10,7 @@ import java.util.*
 class Platform {
     var greenPlatformTexture: Texture
     var platformPosition: Vector2
-    private lateinit var rand: Random
+    private var rand: Random
     var bounds: Rectangle
     var velocity: Vector2
     var fallSpeed:Float

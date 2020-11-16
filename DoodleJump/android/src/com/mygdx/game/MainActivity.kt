@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Auto", "Logged " + sp.getString("userKey", ""))
 
         if (!sp.getBoolean("logged", false)) {
-            supportFragmentManager.beginTransaction().add(R.id.fragment_container, MenuFragment()).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MenuFragment()).commit()
         }
         else {
             val userFragment = UserFragment()
@@ -75,13 +75,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        Log.d(MAIN_TAG, "Game exited, onRestart")
-        if (Gdx.files?.local("scores.txt") != null) {
-            val file =   Gdx.files.local("scores.txt")
-            Log.d(MAIN_TAG, file.readString())
-        }
-        else {
-            Log.d(MAIN_TAG, "Unable to read scores.txt")
+        if (sp.getBoolean("logged", false)) {
+            Toast.makeText(this, "Please login for saving you score", Toast.LENGTH_LONG).show()
         }
     }
 

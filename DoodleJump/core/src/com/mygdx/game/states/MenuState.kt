@@ -21,7 +21,7 @@ class MenuState(gameStateManager: GameStateManager, val scoreValue: Int) : State
     private var newScore: Score
     private var centerX = Gdx.graphics.width/2
     private var centerY = Gdx.graphics.height/2
-    private lateinit var myPreferences: Preferences
+    private var myPreferences: Preferences
 
     init {
 

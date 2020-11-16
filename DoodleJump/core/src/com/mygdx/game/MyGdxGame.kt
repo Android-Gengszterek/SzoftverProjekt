@@ -49,7 +49,7 @@ class MyGdxGame : ApplicationAdapter() {
             scoreString = "$scoreString $score"
         }
         Gdx.app.log("Game", scoreString)
-        val file = Gdx.files.local("scores.txt").apply {
+        Gdx.files.local("scores.txt").apply {
             writeString( scoreString, false)
         }
         myPreferences.clear()
