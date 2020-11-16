@@ -75,12 +75,8 @@ class RegisterFragment : Fragment() {
 
         database = Firebase.database.reference
 
-        backButton.setOnClickListener {
-            fragmentManager?.popBackStack()
-        }
-        registerButton.setOnClickListener {
-            registerButtonPressed()
-        }
+        backButton.setOnClickListener { this.backButtonPressed() }
+        registerButton.setOnClickListener { registerButtonPressed() }
 
         val db = database.child("users")
 
@@ -169,6 +165,10 @@ class RegisterFragment : Fragment() {
             }
         }
         return true
+    }
+
+    private fun backButtonPressed(){
+        fragmentManager?.popBackStack()
     }
 }
 

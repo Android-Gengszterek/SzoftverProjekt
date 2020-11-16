@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import java.util.*
 
 class GameStateManager{
-    private lateinit var states: Stack<State>
+    private var states: Stack<State>
 
     constructor(){
         states = Stack<State>();
