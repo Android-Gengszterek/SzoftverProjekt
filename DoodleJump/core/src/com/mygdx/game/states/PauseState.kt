@@ -73,15 +73,15 @@ class PauseState(cam: OrthographicCamera) {
 
         bitmapFont3.draw(spriteBatch, "On", Gdx.graphics.width/2 - getTextWidth(bitmapFont,"ON")/3 + offsetOnText, bottomLeftPoint.y + Gdx.graphics.height - 550f)
 
-        bitmapFont3.draw(spriteBatch, "Controls:", bottomLeftPoint.x + 50f, bottomLeftPoint.y + Gdx.graphics.height/2+200f)
+        bitmapFont3.draw(spriteBatch, "Controls:", bottomLeftPoint.x + 50f, bottomLeftPoint.y + Gdx.graphics.height-750f)
 
-        spriteBatch.draw(exampleImage, 50f, bottomLeftPoint.y + 150f, 500f, 800f)
-        bitmapFont3.draw(spriteBatch, "Pause", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height/2+50f)
-        bitmapFont3.draw(spriteBatch, "Shoot", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height/2-130f)
-        bitmapFont3.draw(spriteBatch, "Move left", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height/2-330f)
-        bitmapFont3.draw(spriteBatch, "Move right", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height/2-580f)
+        spriteBatch.draw(exampleImage, 50f, bottomLeftPoint.y + Gdx.graphics.height-1650f, 500f, 800f)
+        bitmapFont3.draw(spriteBatch, "Pause", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height-850f)
+        bitmapFont3.draw(spriteBatch, "Shoot", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height-1050f)
+        bitmapFont3.draw(spriteBatch, "Move left", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height-1250f)
+        bitmapFont3.draw(spriteBatch, "Move right", bottomLeftPoint.x + 580f, bottomLeftPoint.y + Gdx.graphics.height-1450f)
 
-        bitmapFont2.draw(spriteBatch, "Go to informations", bottomLeftPoint.x + 150f, bottomLeftPoint.y + 100f)
+        bitmapFont2.draw(spriteBatch, "Go to informations", bottomLeftPoint.x +Gdx.graphics.width-getTextWidth(bitmapFont2,"Go to informations")- 200f, bottomLeftPoint.y + 100f)
         spriteBatch.draw(nextButton, bottomLeftPoint.x+Gdx.graphics.width-150f, bottomLeftPoint.y, 150f, 150f)
 
         spriteBatch.draw(informationTexture, bottomLeftPoint.x + informationOffset, bottomLeftPoint.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
