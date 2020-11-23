@@ -22,11 +22,13 @@ class Spring {
         bounds = Rectangle(springPosition.x, springPosition.y, width,height )
     }
 
+    // returns true if the texture overlaps with the parameters bounds
     fun collide(bound: Rectangle):Boolean{
         return bounds.overlaps(bound)
 
     }
 
+    // spring will be replaced in its platform
     fun update(){
         springPosition.x = basePlatform.platformPosition.x + (basePlatform.width/2) - (width/2)
         springPosition.y = basePlatform.platformPosition.y + basePlatform.height

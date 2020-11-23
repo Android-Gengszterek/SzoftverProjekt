@@ -15,6 +15,7 @@ class PauseButton {
     var pausePosition: Vector2
     var cam: OrthographicCamera
 
+    // creating pause button font parameters
     constructor(cam: OrthographicCamera, size: Int = 100, color: Color = Color.RED, borderWidth: Float = 5f){
         this.cam = cam
 

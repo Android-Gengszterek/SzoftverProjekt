@@ -23,6 +23,7 @@ class Player{
     var height: Float = 200f
     var isImmune: Boolean = false
 
+    // init player attributes
     constructor(x:Int, y:Int){
         position = Vector3(x.toFloat(),y.toFloat(),0f)
         velocity = Vector3(0f,0f,0f)

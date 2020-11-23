@@ -12,7 +12,7 @@ class Jetpack {
     var height = 150f
     var basePlatform: Platform
 
-
+    // init jetpack
     constructor(platform: Platform){
         basePlatform = platform
         jetpackTexture = Texture("jetpack.png")
@@ -22,6 +22,7 @@ class Jetpack {
         bounds = Rectangle(jetpackPosition.x, jetpackPosition.y, width,height )
     }
 
+    // returns true if the texture overlaps with the parameters bounds
     fun collide(bound: Rectangle):Boolean{
         return bounds.overlaps(bound)
 
