@@ -1,6 +1,5 @@
-package com.mygdx.game.fragments
+package com.mygdx.game.ui.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,12 +18,13 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mygdx.game.R
-import com.mygdx.game.classes.USER_CLASS
-import com.mygdx.game.classes.User
+import com.mygdx.game.data.classes.USER_CLASS
+import com.mygdx.game.data.classes.User
 import java.util.regex.Pattern
 
-class RegisterFragment : Fragment() {
+const val REGISTER_TAG = "Register"
 
+class RegisterFragment : Fragment() {
     private lateinit var backButton: Button
     private lateinit var registerButton: Button
     private lateinit var userNameEditText: EditText

@@ -1,4 +1,4 @@
-package com.mygdx.game.fragments
+package com.mygdx.game.ui.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
@@ -14,13 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.files.FileHandle
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mygdx.game.R
-import com.mygdx.game.classes.*
+import com.mygdx.game.data.classes.*
+import com.mygdx.game.ui.adapters.LeaderBoardAdapter
+import com.mygdx.game.ui.adapters.MyAdapter
 
 const val USER_TAG = "User"
 const val USER_KEY = "userKey"
@@ -43,10 +44,6 @@ class UserFragment : Fragment() {
     private lateinit var database: DatabaseReference
     private lateinit var sp: SharedPreferences
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_user, container, false)
@@ -54,6 +51,17 @@ class UserFragment : Fragment() {
         loadData(view)
 
         return view
+    }
+
+    companion object {
+        fun newInstance(userId: String?): UserFragment {
+            val args = Bundle()
+            args.putSerializable(USER_CLASS, userId)
+
+            val fragment = UserFragment()
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     private fun setupUI(view: View) {
