@@ -10,11 +10,11 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.mygdx.game.R
+import com.mygdx.game.data.MyFirebaseDatabase
 import com.mygdx.game.data.classes.User
 import com.mygdx.game.ui.constants.ErrorMessage
 import com.mygdx.game.ui.constants.ToastMessage
 import kotlin.collections.ArrayList
-import com.mygdx.game.data.FirebaseDatabase
 
 const val LOGIN_TAG = "Login"
 
@@ -24,7 +24,7 @@ class LoginFragment : Fragment() {
     private lateinit var userName: EditText
     private lateinit var password: EditText
 
-    private lateinit var database: FirebaseDatabase
+    private lateinit var database: MyFirebaseDatabase
     private lateinit var users: ArrayList<User?>
     private lateinit var myUser: User
 
@@ -52,13 +52,13 @@ class LoginFragment : Fragment() {
         userName = view.findViewById(R.id.username_editTextTextPersonName)
         password = view.findViewById(R.id.password_editTextTextPassword)
         users = ArrayList()
-        database = FirebaseDatabase()
-        backButton.setOnClickListener { this.backButtonPressed() }
-        loginButton.setOnClickListener { this.logInButtonPressed() }
+        database = MyFirebaseDatabase()
+        backButton.setOnClickListener { backButtonPressed() }
+        loginButton.setOnClickListener { logInButtonPressed() }
     }
 
     private fun getUsers(){
-
+        users = database.getUsers()
     }
 
     private fun checkEmptyFields(): Boolean {

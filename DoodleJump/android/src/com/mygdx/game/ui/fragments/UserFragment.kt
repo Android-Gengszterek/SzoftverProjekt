@@ -20,11 +20,14 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mygdx.game.R
 import com.mygdx.game.data.classes.*
+import com.mygdx.game.ui.activitys.SHARED_PREF_NAME
 import com.mygdx.game.ui.adapters.LeaderBoardAdapter
-import com.mygdx.game.ui.adapters.MyAdapter
+import com.mygdx.game.ui.adapters.UserScoresAdapter
+import com.mygdx.game.ui.constants.DatabasePath
+import com.mygdx.game.ui.constants.Key
 
 const val USER_TAG = "User"
-const val USER_KEY = "userKey"
+const val SCORES_LOCAL = "scores.txt"
 
 @Suppress("UNCHECKED_CAST")
 class UserFragment : Fragment() {
@@ -33,7 +36,6 @@ class UserFragment : Fragment() {
     private lateinit var userNameTextView: TextView
     private lateinit var scoreRecyclerView: RecyclerView
     private lateinit var leaderRecyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var viewManager2: RecyclerView.LayoutManager
 
@@ -43,14 +45,14 @@ class UserFragment : Fragment() {
     private lateinit var allScores: ArrayList<Score>
     private lateinit var database: DatabaseReference
     private lateinit var sp: SharedPreferences
+    private lateinit var mView: View
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_user, container, false)
-        setupUI(view)
-        loadData(view)
-
-        return view
+        mView = inflater.inflate(R.layout.fragment_user, container, false)
+        setupUI()
+        loadData()
+        return mView
     }
 
     companion object {
@@ -64,11 +66,15 @@ class UserFragment : Fragment() {
         }
     }
 
-    private fun setupUI(view: View) {
-        userNameTextView = view.findViewById(R.id.textView2)
-        logOutButton = view.findViewById(R.id.log_out_button)
+    override fun onStart() {
+        super.onStart()
+    }
+
+    private fun setupUI() {
+        userNameTextView = mView.findViewById(R.id.textView2)
+        logOutButton = mView.findViewById(R.id.log_out_button)
         logOutButton.setOnClickListener {
-            sp.edit().putBoolean("logged", false).apply();
+            sp.edit().putBoolean(Key.SHARED_PREF_LOGGED, false).apply();
             fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, MenuFragment())?.commit()
         }
         database = Firebase.database.reference
@@ -76,44 +82,20 @@ class UserFragment : Fragment() {
         allScores = ArrayList()
         viewManager = LinearLayoutManager(this.context)
         viewManager2 = LinearLayoutManager(this.context)
-        sp = activity!!.getSharedPreferences("login", MODE_PRIVATE)
+        sp = activity!!.getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE)
     }
 
-    private fun getAllScores(view: View) {
-        val dbScores = database.child("scores")
+    private fun getAllScores() {
+        val dbScores = database.child(DatabasePath.SCORES)
         dbScores.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (d in snapshot.children) {
-                    val scoreValue = d.child("scoreValue").value.toString().toInt()
-                    val userId = d.child("userId").value.toString()
+                    val scoreValue = d.child(DatabasePath.SCORE_VALUE).value.toString().toInt()
+                    val userId = d.child(DatabasePath.SCORE_USERID).value.toString()
                     allScores.add(Score(userId, scoreValue))
                     Log.d(USER_TAG, "Leaderboard:  $scoreValue")
                 }
-
-                allScores.forEach {
-                    if (it.userId == myUser.userId) {
-                        myScores.add(it)
-                    }
-                }
-                myScores.sortByDescending {
-                    it.scoreValue
-                }
-                allScores.sortByDescending {
-                    it.scoreValue
-                }
-                viewAdapter = MyAdapter(myScores)
-                scoreRecyclerView = view.findViewById<RecyclerView>(R.id.myscores_recyclerView).apply {
-                    setHasFixedSize(true)
-                    layoutManager = viewManager
-                    adapter = viewAdapter
-                }
-
-                leaderRecyclerView = view.findViewById<RecyclerView>(R.id.leaderboard_recycleView).apply {
-                    setHasFixedSize(true)
-                    layoutManager = viewManager2
-                    adapter = LeaderBoardAdapter(allScores)
-                }
-                //  Log.d(USER_TAG, allScores[0].scoreValue.toString())
+                setUpRecyclerViews()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -122,27 +104,64 @@ class UserFragment : Fragment() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d(USER_TAG, "Game exited, onResume")
+        getCurrentPlayedScores()
+    }
+
+    private fun setUpRecyclerViews() {
+        allScores.forEach {
+            if (it.userId == myUser.userId) {
+                myScores.add(it)
+            }
+        }
+        myScores.sortByDescending {
+            it.scoreValue
+        }
+        allScores.sortByDescending {
+            it.scoreValue
+        }
+        scoreRecyclerView = mView.findViewById<RecyclerView>(R.id.myscores_recyclerView).apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = UserScoresAdapter(myScores)
+        }
+
+        leaderRecyclerView = mView.findViewById<RecyclerView>(R.id.leaderboard_recycleView).apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager2
+            adapter = LeaderBoardAdapter(allScores)
+        }
+    }
+
     @SuppressLint("CommitPrefEdits")
-    private fun loadData(view: View) {
+    private fun loadData() {
+        //Check if the user was logged or it's the first time
         val args: Bundle? = arguments
-        if (sp.getBoolean("logged", false)) {
-            myUserId = sp.getString("userKey", "").toString()
+        if (sp.getBoolean(Key.SHARED_PREF_LOGGED, false)) {
+            myUserId = sp.getString(Key.USER_KEY, "").toString()
         } else {
             myUserId = args?.getSerializable(USER_CLASS) as String
-            sp.edit().putString("userKey", myUserId).apply()
-            sp.edit().putBoolean("logged", true).apply()
+            sp.edit().putString(Key.USER_KEY, myUserId).apply()
+            sp.edit().putBoolean(Key.SHARED_PREF_LOGGED, true).apply()
         }
-        val db = database.child("users")
+
+        getCurrentUser()
+    }
+
+    private fun getCurrentUser() {
+        val db = database.child(DatabasePath.USERS)
         db.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                userNameTextView.text = snapshot.child(myUserId).child("userName").value.toString()
+                userNameTextView.text = snapshot.child(myUserId).child(DatabasePath.USER_NAME).value.toString()
                 myUser = User(
                         myUserId,
-                        snapshot.child(myUserId).child("userName").value.toString(),
-                        snapshot.child(myUserId).child("password").value.toString(),
+                        snapshot.child(myUserId).child(DatabasePath.USER_NAME).value.toString(),
+                        snapshot.child(myUserId).child(DatabasePath.PASSWORD).value.toString(),
                 )
                 Log.d(USER_TAG, myUser.toString())
-                getAllScores(view)
+                getAllScores()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -151,32 +170,29 @@ class UserFragment : Fragment() {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(USER_TAG, "Game exited, onResume")
-
+    private fun getCurrentPlayedScores(){
         try {
-            val file = Gdx.files.local("scores.txt")
+            val scoresFile = Gdx.files.local(SCORES_LOCAL)
             try {
-                file.readString()
-                updateScore(file)
+                scoresFile.readString()
+                updateNewScores(scoresFile)
             } catch (e: Exception) {
                 Log.d(USER_TAG, "Invalid file")
             }
-            Gdx.files.local("scores.txt").delete()
+            Gdx.files.local(SCORES_LOCAL).delete()
         } catch (e: NullPointerException) {
             Log.d(USER_TAG, "Unable to read scores.txt")
         }
     }
 
-    private fun updateScore(file: FileHandle) {
-        val string = file.readString()
-        val newScores = string.split(" ")
+    private fun updateNewScores(file: FileHandle) {
+        val scoresString = file.readString()
+        val newScores = scoresString.split(" ")
         newScores.forEach {
             if (it != "" && it != " ") {
-                val key = database.child("scores").push().key.toString()
+                val key = database.child(DatabasePath.SCORES).push().key.toString()
                 val newScore = Score(myUserId, it.toInt())
-                database.child("scores").child(key).setValue(newScore)
+                database.child(DatabasePath.SCORES).child(key).setValue(newScore)
                         .addOnSuccessListener {
                             Log.d(USER_TAG, "Success score UPDATE -- $it")
                         }

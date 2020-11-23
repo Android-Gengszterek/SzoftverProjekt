@@ -13,13 +13,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mygdx.game.R
+import com.mygdx.game.data.MyFirebaseDatabase
 import com.mygdx.game.data.classes.USER_CLASS
 import com.mygdx.game.data.classes.User
+import com.mygdx.game.ui.constants.ErrorMessage
+import com.mygdx.game.ui.constants.ToastMessage
 import java.util.regex.Pattern
 
 const val REGISTER_TAG = "Register"
@@ -31,13 +33,8 @@ class RegisterFragment : Fragment() {
     private lateinit var passwordEditText: EditText
     private lateinit var confPassEditText: EditText
 
-    private lateinit var database: DatabaseReference
-    private lateinit var myUserKey: String
-    private var users = ArrayList<User?>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var database: MyFirebaseDatabase
+    private lateinit var users: ArrayList<User?>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -48,21 +45,10 @@ class RegisterFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        userNameEditText.afterTextChanged {
-            if (it.isEmpty()){
-                userNameEditText.error = "This field is empty!"
-            }
-        }
-        passwordEditText.afterTextChanged {
-            if (it.isEmpty()){
-                passwordEditText.error = "This field is empty!"
-            }
-        }
-        confPassEditText.afterTextChanged {
-            if (it.isEmpty()){
-                confPassEditText.error = "This field is empty!"
-            }
-        }
+        getUsers()
+        userNameEditText.isEmptyFieldListener()
+        passwordEditText.isEmptyFieldListener()
+        confPassEditText.isEmptyFieldListener()
     }
 
 
@@ -73,86 +59,47 @@ class RegisterFragment : Fragment() {
         passwordEditText = view.findViewById(R.id.password_editTextTextPassword)
         confPassEditText = view.findViewById(R.id.password_editTextTextPassword2)
 
-        database = Firebase.database.reference
-
-        backButton.setOnClickListener { this.backButtonPressed() }
+        database = MyFirebaseDatabase()
+        backButton.setOnClickListener { backButtonPressed() }
         registerButton.setOnClickListener { registerButtonPressed() }
-
-        val db = database.child("users")
-
-        db.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (d in dataSnapshot.children) {
-                    val key = d.key.toString()
-                    val username = d.child("userName").value.toString()
-                    val password = d.child("password").value.toString()
-                    val user = User(key, username,password)
-                    users.add(user)
-                    Log.d("Users", user.toString())
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {}
-        })
     }
 
     private fun writeNewUser(userName: String, password: String) {
-        val key = database.child("users").push().key.toString()
-        myUserKey = key
-        val user = User(null, userName, password )
-        database.child("users").child(key).setValue(user)
-                .addOnSuccessListener {
-                    Toast.makeText(this.context, "Registration success", Toast.LENGTH_LONG).show()
-                    val userFragment = UserFragment()
-                    val bundle = Bundle()
-                    bundle.putSerializable(USER_CLASS, myUserKey)
-                    userFragment.arguments = bundle
+        database.writeNewUser(userName, password, this.context, fragmentManager)
+    }
 
-                    fragmentManager?.beginTransaction()?.replace(
-                            R.id.fragment_container,
-                            userFragment,
-                            LOGIN_TAG
-                    )?.commit()
-
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this.context, "Registration fail", Toast.LENGTH_LONG).show()
-                }
+    private fun getUsers(){
+        users = database.getUsers()
     }
 
     private fun emptyFieldCheck() = (userNameEditText.text.isNotEmpty() && passwordEditText.text.isNotEmpty() && confPassEditText.text.isNotEmpty())
 
-
     private fun registerButtonPressed(){
         if (emptyFieldCheck()) {
             if (userDataCheck()) {
-                writeNewUser(
-                        userNameEditText.text.toString(),
-                        passwordEditText.text.toString(),
-                )
+                writeNewUser(userNameEditText.text.toString(), passwordEditText.text.toString())
             }
         }
         else {
-            Toast.makeText(this.context, "Please fill out all the fields!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this.context, ToastMessage.FILL_OUT_FIELDS, Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun userDataCheck() = when {
         userNameEditText.text.length < 5 || userNameEditText.text.length > 10 -> {
-            userNameEditText.error = "Minimum 5, maximum 10 character"
+            userNameEditText.error = ErrorMessage.USERNAME_LENGTH
             false
         }
         !checkUniqueUsername() -> {
-            userNameEditText.error = "This username is already exist"
+            userNameEditText.error = ErrorMessage.USERNAME_EXIST
             false
         }
         !Pattern.compile("(?=.*[0-9]).{8,}").matcher(passwordEditText.text).matches() -> {
-            passwordEditText.error = "Minimum 8 character, at least 1 digit"
+            passwordEditText.error = ErrorMessage.PASSWORD_LENGTH
             false
-
         }
         passwordEditText.text.toString() != confPassEditText.text.toString() -> {
-            confPassEditText.error = "Not the same password"
+            confPassEditText.error = ErrorMessage.CONFIRM_PASSWORD
             false
         }
         else -> true
@@ -184,4 +131,12 @@ fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
             afterTextChanged.invoke(editable.toString())
         }
     })
+}
+
+fun EditText.isEmptyFieldListener() {
+    this.afterTextChanged {
+        if (it.isEmpty()){
+            this.error = ErrorMessage.EMPTY_FIELD
+        }
+    }
 }

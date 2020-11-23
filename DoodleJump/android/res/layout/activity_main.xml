@@ -38,7 +38,6 @@
         android:layout_marginBottom="20dp"
         android:background="@drawable/playbuttonshape"
         android:fontFamily="casual"
-        android:onClick="playButtonPressed"
         android:shadowColor="#A83649"
         android:shadowDx="5"
         android:shadowDy="3"

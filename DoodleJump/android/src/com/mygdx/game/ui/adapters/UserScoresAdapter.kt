@@ -10,7 +10,7 @@ import com.mygdx.game.R
 import com.mygdx.game.data.classes.Score
 import kotlinx.android.synthetic.main.score_item.view.*
 
-class MyAdapter(private val myDataset: ArrayList<Score>) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+class UserScoresAdapter(private val myDataset: ArrayList<Score>) : RecyclerView.Adapter<UserScoresAdapter.MyViewHolder>() {
 
     class MyViewHolder(val itemView: View): RecyclerView.ViewHolder(itemView) {
         val numberTextView = itemView.score_number

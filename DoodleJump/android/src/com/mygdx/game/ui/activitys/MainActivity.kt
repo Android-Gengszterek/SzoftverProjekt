@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         playButton = binding.button
         frameLayout = binding.fragmentContainer
         sp = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE)
+        playButton.setOnClickListener { playButtonPressed() }
     }
 
     override fun onStart() {
@@ -53,14 +54,14 @@ class MainActivity : AppCompatActivity() {
         else {
             val userFragment = UserFragment()
             val bundle = Bundle()
-            bundle.putSerializable(USER_CLASS, sp.getString(Key.USER, ""))
+            bundle.putSerializable(USER_CLASS, sp.getString(Key.USER_KEY, ""))
             userFragment.arguments = bundle
             Toast.makeText(this, ToastMessage.AUTO_LOGIN, Toast.LENGTH_SHORT).show()
             goTo(userFragment, MAIN_TAG)
         }
     }
 
-    fun playButtonPressed(view: View){
+    private fun playButtonPressed() {
         val intent = Intent(this, AndroidLauncher::class.java)
         startActivity(intent)
     }
