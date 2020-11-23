@@ -20,5 +20,8 @@
     <string name="log_out_text">Log Out</string>
     <string name="best_scores">My Scores</string>
     <string name="leaderboard">Leaderboard</string>
+    <string name="gergely_zsolt">Gergely Zsolt</string>
+    <string name="halasz_botond">Halasz Botond</string>
+    <string name="szanto_zoltan">Szanto Zoltan</string>
 
 </resources>
