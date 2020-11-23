@@ -1,6 +1,4 @@
-package com.mygdx.game.classes
-
-import com.google.firebase.database.DataSnapshot
+package com.mygdx.game.data.classes
 
 class Score(
         var userId: String? = "",

@@ -1,4 +1,4 @@
-package com.mygdx.game.classes
+package com.mygdx.game.data.classes
 
 import com.google.firebase.database.IgnoreExtraProperties
 import java.io.Serializable

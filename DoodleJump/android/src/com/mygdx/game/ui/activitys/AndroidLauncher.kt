@@ -1,10 +1,10 @@
-package com.mygdx.game
+package com.mygdx.game.ui.activitys
 
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
+import com.mygdx.game.MyGdxGame
 
 
 class AndroidLauncher : AndroidApplication() {

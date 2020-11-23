@@ -1,4 +1,4 @@
-package com.mygdx.game.fragments
+package com.mygdx.game.ui.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -6,11 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.mygdx.game.R
-import com.mygdx.game.classes.USER_CLASS
-import com.mygdx.game.classes.User
 
 const val MENU_TAG = "MenuFragment"
 

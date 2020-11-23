@@ -1,6 +1,5 @@
-package com.mygdx.game
+package com.mygdx.game.ui.activitys
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,22 +10,21 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.badlogic.gdx.Gdx
+import androidx.fragment.app.Fragment
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.mygdx.game.classes.USER_CLASS
+import com.mygdx.game.R
+import com.mygdx.game.data.classes.USER_CLASS
 import com.mygdx.game.databinding.ActivityMainBinding
-import com.mygdx.game.fragments.LOGIN_TAG
-import com.mygdx.game.fragments.MenuFragment
-import com.mygdx.game.fragments.UserFragment
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
-import java.security.AccessController.getContext
+import com.mygdx.game.ui.constants.Key
+import com.mygdx.game.ui.constants.ToastMessage
+import com.mygdx.game.ui.fragments.MenuFragment
+import com.mygdx.game.ui.fragments.UserFragment
 
 
 const val MAIN_TAG = "MainActivity"
+const val SHARED_PREF_NAME = "login"
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,41 +41,44 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         playButton = binding.button
         frameLayout = binding.fragmentContainer
-        sp = getSharedPreferences("login", MODE_PRIVATE)
+        sp = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE)
+        playButton.setOnClickListener { playButtonPressed() }
     }
 
     override fun onStart() {
         super.onStart()
-        Log.d("Auto", "Logged " + sp.getBoolean("logged", false))
-        Log.d("Auto", "Logged " + sp.getString("userKey", ""))
-
-        if (!sp.getBoolean("logged", false)) {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MenuFragment()).commit()
+        Log.d(MAIN_TAG, "Logged " + sp.getBoolean(Key.SHARED_PREF_LOGGED, false) + " " + sp.getString("userKey", ""))
+        if (!sp.getBoolean(Key.SHARED_PREF_LOGGED, false)) {
+            goTo(MenuFragment(), MAIN_TAG)
         }
         else {
             val userFragment = UserFragment()
             val bundle = Bundle()
-            bundle.putSerializable(USER_CLASS, sp.getString("userKey", ""))
+            bundle.putSerializable(USER_CLASS, sp.getString(Key.USER_KEY, ""))
             userFragment.arguments = bundle
-            Toast.makeText(this, "Auto Login", Toast.LENGTH_SHORT).show()
-            supportFragmentManager.beginTransaction().replace(
-                    R.id.fragment_container,
-                    userFragment,
-                    LOGIN_TAG
-            ).commit()
+            Toast.makeText(this, ToastMessage.AUTO_LOGIN, Toast.LENGTH_SHORT).show()
+            goTo(userFragment, MAIN_TAG)
         }
     }
 
-    fun playButtonPressed(view: View){
+    private fun playButtonPressed() {
         val intent = Intent(this, AndroidLauncher::class.java)
         startActivity(intent)
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        if (sp.getBoolean("logged", false)) {
-            Toast.makeText(this, "Please login for saving you score", Toast.LENGTH_LONG).show()
+    override fun onResume() {
+        super.onResume()
+        if (!sp.getBoolean(Key.SHARED_PREF_LOGGED, false)) {
+            Toast.makeText(this, ToastMessage.SAVE_SCORE, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun goTo(fragment: Fragment, tag: String) {
+        supportFragmentManager.beginTransaction().replace(
+                R.id.fragment_container,
+                fragment,
+                tag
+        ).commit()
     }
 
 }

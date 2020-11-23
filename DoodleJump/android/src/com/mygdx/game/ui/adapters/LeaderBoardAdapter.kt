@@ -1,4 +1,4 @@
-package com.mygdx.game.classes
+package com.mygdx.game.ui.adapters
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -13,9 +13,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mygdx.game.R
-import com.mygdx.game.fragments.USER_TAG
+import com.mygdx.game.data.classes.Score
+import com.mygdx.game.ui.fragments.USER_TAG
 import kotlinx.android.synthetic.main.leaderboard_item.view.*
-import kotlinx.android.synthetic.main.score_item.view.*
 
 class LeaderBoardAdapter(private val myDataset: ArrayList<Score>) : RecyclerView.Adapter<LeaderBoardAdapter.MySceondViewHolder>() {
 
