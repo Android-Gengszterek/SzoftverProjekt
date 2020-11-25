@@ -17,6 +17,7 @@ class Monster {
     private var monsterStartScore = 200
     private var monsterSpacingAsScore = 500
 
+    // init monster
     constructor(){
         velocity = Vector2(0f,0f)
         monsterTexture = Texture("green_monster.png")
@@ -25,7 +26,9 @@ class Monster {
 
     }
 
+    // returns true if the texture overlaps with the parameters bounds
     fun collide(player: Player):Boolean{
+        // if the player uses jetpack he is immune to the monster
         if( player.bounds.overlaps(bounds) && !player.isImmune){
             // if the player touches the monster from below or from the sides then die
             if(player.bounds.y < monsterPosition.y+height-100f) {

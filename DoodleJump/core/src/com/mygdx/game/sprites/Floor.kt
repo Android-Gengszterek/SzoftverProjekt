@@ -12,6 +12,7 @@ class Floor{
     var floorPosition: Vector2
     var bounds: Rectangle
 
+    // initializing floor
     constructor(){
         floorTexture = Texture("floor.png")
         floorPosition = Vector2(-floorTexture.width.toFloat(),-floorTexture.height/2f)
@@ -19,6 +20,7 @@ class Floor{
 
     }
 
+    // returns true if the texture overlaps with the parameters bounds
     fun collide(bound: Rectangle):Boolean{
         return bound.overlaps(bounds)
     }
