@@ -1,5 +1,9 @@
 package com.mygdx.game.ui.fragments
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -75,7 +79,7 @@ class RegisterFragment : Fragment() {
     private fun emptyFieldCheck() = (userNameEditText.text.isNotEmpty() && passwordEditText.text.isNotEmpty() && confPassEditText.text.isNotEmpty())
 
     private fun registerButtonPressed(){
-        if (emptyFieldCheck()) {
+        if (isOnline() && emptyFieldCheck()) {
             if (userDataCheck()) {
                 writeNewUser(userNameEditText.text.toString(), passwordEditText.text.toString())
             }
@@ -116,6 +120,18 @@ class RegisterFragment : Fragment() {
 
     private fun backButtonPressed(){
         fragmentManager?.popBackStack()
+    }
+
+    @SuppressLint("ShowToast")
+    private fun isOnline(): Boolean {
+        val cm = this.context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        if (activeNetwork?.isConnectedOrConnecting != true) {
+            Toast.makeText(this.context, ToastMessage.NETWORK, Toast.LENGTH_LONG).show()
+            return false
+        }
+        return true
+
     }
 }
 

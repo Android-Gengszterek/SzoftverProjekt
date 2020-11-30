@@ -2,5 +2,7 @@
 <resources>
     <color name="ic_background_color">#FFFFFFFF</color>
     <color name="menu_background">#fffbd5</color>
+    <color name="green">#037100</color>
+    <color name="black">#000000</color>
 
 </resources>

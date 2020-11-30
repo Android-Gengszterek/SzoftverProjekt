@@ -8,4 +8,5 @@ object ToastMessage {
     val REG_SUCCESS = "Registration success"
     val REG_FAIL = "Registration failed"
     val FILL_OUT_FIELDS = "Please fill out all the fields!"
+    val NETWORK = "No Internet connection!"
 }
