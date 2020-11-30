@@ -41,7 +41,6 @@ class MyGdxGame : ApplicationAdapter() {
     }
 
     override fun dispose() {
-       // System.out.println("Score MyGdxGame: ${myPreferences.getInteger("newscore")}")
         val scoreKeys = myPreferences.get()
         var scoreString = ""
         scoreKeys.forEach {

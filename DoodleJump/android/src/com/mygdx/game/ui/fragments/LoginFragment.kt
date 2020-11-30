@@ -1,5 +1,11 @@
 package com.mygdx.game.ui.fragments
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.mygdx.game.R
 import com.mygdx.game.data.MyFirebaseDatabase
@@ -95,7 +102,7 @@ class LoginFragment : Fragment() {
     }
 
     private  fun logInButtonPressed() {
-        if (checkEmptyFields() && checkUsernameAndPassword()) {
+        if (isOnline() && checkEmptyFields() && checkUsernameAndPassword()) {
             val userFragment = UserFragment.newInstance(myUser.userId)
             Toast.makeText(this.context, ToastMessage.LOGIN_SUCCESS, Toast.LENGTH_SHORT).show()
             goTo(userFragment, LOGIN_TAG)
@@ -111,6 +118,18 @@ class LoginFragment : Fragment() {
                 fragment,
                 tag
         )?.commit()
+    }
+
+    @SuppressLint("ShowToast")
+    private fun isOnline(): Boolean {
+        val cm = this.context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        if (activeNetwork?.isConnectedOrConnecting != true) {
+            Toast.makeText(this.context, ToastMessage.NETWORK, Toast.LENGTH_LONG).show()
+            return false
+        }
+        return true
+
     }
 
 }

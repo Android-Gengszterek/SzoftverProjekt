@@ -68,9 +68,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!sp.getBoolean(Key.SHARED_PREF_LOGGED, false)) {
-            Toast.makeText(this, ToastMessage.SAVE_SCORE, Toast.LENGTH_LONG).show()
-        }
     }
 
     private fun goTo(fragment: Fragment, tag: String) {

@@ -24,5 +24,6 @@
     <string name="halasz_botond">Halász Botond</string>
     <string name="szanto_zoltan">Szántó Zoltán</string>
     <string name="todo">TODO</string>
+    <string name="this_is_an_info_button">This is an info button</string>
 
 </resources>
