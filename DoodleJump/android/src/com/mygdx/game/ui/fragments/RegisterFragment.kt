@@ -7,7 +7,6 @@ import android.net.NetworkInfo
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +14,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.mygdx.game.R
 import com.mygdx.game.data.MyFirebaseDatabase
-import com.mygdx.game.data.classes.USER_CLASS
 import com.mygdx.game.data.classes.User
 import com.mygdx.game.ui.constants.ErrorMessage
 import com.mygdx.game.ui.constants.ToastMessage
@@ -33,9 +26,9 @@ const val REGISTER_TAG = "Register"
 class RegisterFragment : Fragment() {
     private lateinit var backButton: Button
     private lateinit var registerButton: Button
-    private lateinit var userNameEditText: EditText
-    private lateinit var passwordEditText: EditText
-    private lateinit var confPassEditText: EditText
+    private lateinit var userName: EditText
+    private lateinit var password: EditText
+    private lateinit var confirmPass: EditText
 
     private lateinit var database: MyFirebaseDatabase
     private lateinit var users: ArrayList<User?>
@@ -50,18 +43,18 @@ class RegisterFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         getUsers()
-        userNameEditText.isEmptyFieldListener()
-        passwordEditText.isEmptyFieldListener()
-        confPassEditText.isEmptyFieldListener()
+        userName.isEmptyFieldListener()
+        password.isEmptyFieldListener()
+        confirmPass.isEmptyFieldListener()
     }
 
 
     private fun setupUI(view: View) {
         backButton = view.findViewById(R.id.back_button)
         registerButton = view.findViewById(R.id.register_button)
-        userNameEditText = view.findViewById(R.id.username_editTextTextPersonName)
-        passwordEditText = view.findViewById(R.id.password_editTextTextPassword)
-        confPassEditText = view.findViewById(R.id.password_editTextTextPassword2)
+        userName = view.findViewById(R.id.username_editTextTextPersonName)
+        password = view.findViewById(R.id.password_editTextTextPassword)
+        confirmPass = view.findViewById(R.id.password_editTextTextPassword2)
 
         database = MyFirebaseDatabase()
         backButton.setOnClickListener { backButtonPressed() }
@@ -76,12 +69,12 @@ class RegisterFragment : Fragment() {
         users = database.getUsers()
     }
 
-    private fun emptyFieldCheck() = (userNameEditText.text.isNotEmpty() && passwordEditText.text.isNotEmpty() && confPassEditText.text.isNotEmpty())
+    private fun emptyFieldCheck() = (userName.text.isNotEmpty() && password.text.isNotEmpty() && confirmPass.text.isNotEmpty())
 
     private fun registerButtonPressed(){
         if (isOnline() && emptyFieldCheck()) {
             if (userDataCheck()) {
-                writeNewUser(userNameEditText.text.toString(), passwordEditText.text.toString())
+                writeNewUser(userName.text.toString(), password.text.toString())
             }
         }
         else {
@@ -90,20 +83,20 @@ class RegisterFragment : Fragment() {
     }
 
     private fun userDataCheck() = when {
-        userNameEditText.text.length < 5 || userNameEditText.text.length > 10 -> {
-            userNameEditText.error = ErrorMessage.USERNAME_LENGTH
+        userName.text.length < 5 || userName.text.length > 10 -> {
+            userName.error = ErrorMessage.USERNAME_LENGTH
             false
         }
         !checkUniqueUsername() -> {
-            userNameEditText.error = ErrorMessage.USERNAME_EXIST
+            userName.error = ErrorMessage.USERNAME_EXIST
             false
         }
-        !Pattern.compile("(?=.*[0-9]).{8,}").matcher(passwordEditText.text).matches() -> {
-            passwordEditText.error = ErrorMessage.PASSWORD_LENGTH
+        !Pattern.compile("(?=.*[0-9]).{8,}").matcher(password.text).matches() -> {
+            password.error = ErrorMessage.PASSWORD_LENGTH
             false
         }
-        passwordEditText.text.toString() != confPassEditText.text.toString() -> {
-            confPassEditText.error = ErrorMessage.CONFIRM_PASSWORD
+        password.text.toString() != confirmPass.text.toString() -> {
+            confirmPass.error = ErrorMessage.CONFIRM_PASSWORD
             false
         }
         else -> true
@@ -111,7 +104,7 @@ class RegisterFragment : Fragment() {
 
     private fun checkUniqueUsername(): Boolean {
         users.forEach {
-            if ( it?.userName == userNameEditText.text.toString()) {
+            if ( it?.userName == userName.text.toString()) {
                 return false
             }
         }
