@@ -8,7 +8,7 @@ import com.mygdx.game.MyGdxGame
 
 
 class AndroidLauncher : AndroidApplication() {
-    private lateinit var sp: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val config = AndroidApplicationConfiguration()

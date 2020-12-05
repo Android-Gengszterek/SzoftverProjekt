@@ -85,7 +85,7 @@ class Platform {
         isMooving = true
     }
 
-    fun update(dt:Float,cam: OrthographicCamera,player: Player){
+    fun update(dt:Float,cam: OrthographicCamera){
         if(isWood) {
             // if the wood platform is in the screen it will move with fallSpeed velocity
             if (platformPosition.y > cam.position.y - (Gdx.graphics.height)) {

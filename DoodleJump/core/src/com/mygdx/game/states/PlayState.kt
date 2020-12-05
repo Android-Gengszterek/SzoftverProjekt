@@ -236,7 +236,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
             }
 
             // wooden platform updating
-            platforms[platforms.size - 1].update(dt,cam,player)
+            platforms[platforms.size - 1].update(dt,cam)
 
 
             for (bullet in bullets) {
@@ -266,7 +266,7 @@ class PlayState(gameStateManager: GameStateManager): State(gameStateManager){
 
             //If the platform is moving it will be redirected at the borders
             for (platform in platforms) {
-                platform.update(dt,cam,player);
+                platform.update(dt,cam);
             }
 
             // if the player falls below the camera's y position then the game ends and a new state will start

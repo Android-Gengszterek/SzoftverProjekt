@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import com.mygdx.game.R
 import com.mygdx.game.data.MyFirebaseDatabase
 import com.mygdx.game.data.classes.User
+import com.mygdx.game.ui.activitys.MainActivity
 import com.mygdx.game.ui.constants.ErrorMessage
 import com.mygdx.game.ui.constants.ToastMessage
 import kotlin.collections.ArrayList
@@ -102,7 +103,7 @@ class LoginFragment : Fragment() {
     }
 
     private  fun logInButtonPressed() {
-        if (isOnline() && checkEmptyFields() && checkUsernameAndPassword()) {
+        if (MainActivity.isOnline(requireContext()) && checkEmptyFields() && checkUsernameAndPassword()) {
             val userFragment = UserFragment.newInstance(myUser.userId)
             Toast.makeText(this.context, ToastMessage.LOGIN_SUCCESS, Toast.LENGTH_SHORT).show()
             goTo(userFragment, LOGIN_TAG)
@@ -118,18 +119,6 @@ class LoginFragment : Fragment() {
                 fragment,
                 tag
         )?.commit()
-    }
-
-    @SuppressLint("ShowToast")
-    private fun isOnline(): Boolean {
-        val cm = this.context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-        if (activeNetwork?.isConnectedOrConnecting != true) {
-            Toast.makeText(this.context, ToastMessage.NETWORK, Toast.LENGTH_LONG).show()
-            return false
-        }
-        return true
-
     }
 
 }

@@ -33,11 +33,11 @@ const val SCORES_LOCAL = "scores.txt"
 class UserFragment : Fragment() {
 
     private lateinit var logOutButton: Button
-    private lateinit var userNameTextView: TextView
+    private lateinit var userName: TextView
     private lateinit var scoreRecyclerView: RecyclerView
     private lateinit var leaderRecyclerView: RecyclerView
-    private lateinit var viewManager: RecyclerView.LayoutManager
-    private lateinit var viewManager2: RecyclerView.LayoutManager
+    private lateinit var scoreViewManager: RecyclerView.LayoutManager
+    private lateinit var leaderViewManager: RecyclerView.LayoutManager
 
     private lateinit var myUser: User
     private lateinit var myUserId: String
@@ -51,7 +51,7 @@ class UserFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         mView = inflater.inflate(R.layout.fragment_user, container, false)
         setupUI()
-        loadData()
+        loadDataFromDatabase()
         return mView
     }
 
@@ -66,12 +66,8 @@ class UserFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
     private fun setupUI() {
-        userNameTextView = mView.findViewById(R.id.textView2)
+        userName = mView.findViewById(R.id.textView2)
         logOutButton = mView.findViewById(R.id.log_out_button)
         logOutButton.setOnClickListener {
             sp.edit().putBoolean(Key.SHARED_PREF_LOGGED, false).apply();
@@ -80,8 +76,8 @@ class UserFragment : Fragment() {
         database = Firebase.database.reference
         myScores = ArrayList()
         allScores = ArrayList()
-        viewManager = LinearLayoutManager(this.context)
-        viewManager2 = LinearLayoutManager(this.context)
+        scoreViewManager = LinearLayoutManager(this.context)
+        leaderViewManager = LinearLayoutManager(this.context)
         sp = activity!!.getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE)
     }
 
@@ -124,19 +120,19 @@ class UserFragment : Fragment() {
         }
         scoreRecyclerView = mView.findViewById<RecyclerView>(R.id.myscores_recyclerView).apply {
             setHasFixedSize(true)
-            layoutManager = viewManager
+            layoutManager = scoreViewManager
             adapter = UserScoresAdapter(myScores)
         }
 
         leaderRecyclerView = mView.findViewById<RecyclerView>(R.id.leaderboard_recycleView).apply {
             setHasFixedSize(true)
-            layoutManager = viewManager2
+            layoutManager = leaderViewManager
             adapter = LeaderBoardAdapter(allScores)
         }
     }
 
     @SuppressLint("CommitPrefEdits")
-    private fun loadData() {
+    private fun loadDataFromDatabase() {
         //Check if the user was logged or it's the first time
         val args: Bundle? = arguments
         if (sp.getBoolean(Key.SHARED_PREF_LOGGED, false)) {
@@ -154,7 +150,7 @@ class UserFragment : Fragment() {
         val db = database.child(DatabasePath.USERS)
         db.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                userNameTextView.text = snapshot.child(myUserId).child(DatabasePath.USER_NAME).value.toString()
+                userName.text = snapshot.child(myUserId).child(DatabasePath.USER_NAME).value.toString()
                 myUser = User(
                         myUserId,
                         snapshot.child(myUserId).child(DatabasePath.USER_NAME).value.toString(),

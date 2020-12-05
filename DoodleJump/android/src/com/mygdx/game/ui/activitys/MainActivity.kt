@@ -1,7 +1,11 @@
 package com.mygdx.game.ui.activitys
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -47,8 +51,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        //auto Login
         Log.d(MAIN_TAG, "Logged " + sp.getBoolean(Key.SHARED_PREF_LOGGED, false) + " " + sp.getString("userKey", ""))
-        if (!sp.getBoolean(Key.SHARED_PREF_LOGGED, false)) {
+        if (!sp.getBoolean(Key.SHARED_PREF_LOGGED, false) || !isOnline(this)) {
             goTo(MenuFragment(), MAIN_TAG)
         }
         else {
@@ -66,16 +71,27 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     private fun goTo(fragment: Fragment, tag: String) {
         supportFragmentManager.beginTransaction().replace(
                 R.id.fragment_container,
                 fragment,
                 tag
         ).commit()
+    }
+
+    companion object {
+
+        @SuppressLint("ShowToast")
+        fun isOnline(context: Context): Boolean {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+            if (activeNetwork?.isConnectedOrConnecting != true) {
+                Toast.makeText(context, ToastMessage.NETWORK, Toast.LENGTH_LONG).show()
+                return false
+            }
+            return true
+
+        }
     }
 
 }
