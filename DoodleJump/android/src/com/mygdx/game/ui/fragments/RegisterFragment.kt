@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import com.mygdx.game.R
 import com.mygdx.game.data.MyFirebaseDatabase
 import com.mygdx.game.data.classes.User
+import com.mygdx.game.ui.activitys.MainActivity
 import com.mygdx.game.ui.constants.ErrorMessage
 import com.mygdx.game.ui.constants.ToastMessage
 import java.util.regex.Pattern
@@ -72,7 +73,7 @@ class RegisterFragment : Fragment() {
     private fun emptyFieldCheck() = (userName.text.isNotEmpty() && password.text.isNotEmpty() && confirmPass.text.isNotEmpty())
 
     private fun registerButtonPressed(){
-        if (isOnline() && emptyFieldCheck()) {
+        if (MainActivity.isOnline(requireContext()) && emptyFieldCheck()) {
             if (userDataCheck()) {
                 writeNewUser(userName.text.toString(), password.text.toString())
             }
@@ -113,18 +114,6 @@ class RegisterFragment : Fragment() {
 
     private fun backButtonPressed(){
         fragmentManager?.popBackStack()
-    }
-
-    @SuppressLint("ShowToast")
-    private fun isOnline(): Boolean {
-        val cm = this.context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-        if (activeNetwork?.isConnectedOrConnecting != true) {
-            Toast.makeText(this.context, ToastMessage.NETWORK, Toast.LENGTH_LONG).show()
-            return false
-        }
-        return true
-
     }
 }
 

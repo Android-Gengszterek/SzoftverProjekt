@@ -1,6 +1,9 @@
 package com.mygdx.game.ui.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -49,5 +52,6 @@ class MenuFragment : Fragment() {
         fragmentManager?.beginTransaction()?.replace(R.id.fragment_container, RegisterFragment())?.
         addToBackStack(MENU_TAG)?.commit()
     }
+
 }
 
