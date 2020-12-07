@@ -1,7 +1,7 @@
 # Doodle Jump
 
-Coordinator: Sztano Zoltan
-Developers: Gergely Zsolt, Halasz Botond
+Coordinator: Szántó Zoltán
+Developers: Gergely Zsolt, Halász Botond
 University: Sapientia EMTE
 
 Hello guys, please enjoy our application!
